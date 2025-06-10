@@ -1,0 +1,6 @@
+export {default as AdditionalSubjectUpdate} from './AdditionalSubjectUpdate'
+export {default as MainSubjectUpdate} from './MainSubjectUpdate'
+export {default as OtherCostsUpdate} from './OtherCostsUpdate'
+export {default as PersonalUpdate} from './PersonalUpdate'
+export {default as AddRooms} from './AddRooms'
+export {default as DeleteStudent} from './DeleteStudent'

@@ -1,0 +1,13 @@
+export { default as Navbar } from './navbar';
+export { default as Slider } from './Slider';
+export { default as Intro } from './Intro';
+export { default as About } from './About';
+export { default as Curriculum } from './Curriculum';
+export { default as IntroCard } from './IntroCard';
+export { default as Application } from './Application';
+export { default as Contact } from './Contact';
+export { default as Footer } from './Footer';
+export { default as NavigationIcon } from './NavigationIcon';
+export { default as Home } from './home';
+export { default as Announcement } from './Announcement';
+export { default as FadeInSection } from './FadeInSection ';

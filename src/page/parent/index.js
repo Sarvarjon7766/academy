@@ -1,0 +1,10 @@
+export { default as ParentDashboard } from './ParentDashboard'
+export { default as ParentHome } from './ParentHome'
+export { default as ParentProfile } from './ParentProfile'
+export { default as Children } from './Children'
+export { default as ParentAttendence } from './ParentAttendence'
+export { default as ParentSchedule } from './ParentSchedule'
+export { default as ParentExam } from './ParentExam'
+export { default as ParentPayments } from './ParentPayments'
+export { default as ParentMessage } from '../../components/ParentMessage'
+

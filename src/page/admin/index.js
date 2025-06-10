@@ -1,0 +1,13 @@
+export { default as AdminDashboard } from './adminDashboard'
+export { default as AdminHome } from './AdminHome'
+export { default as Registration } from './Registration'
+export { default as ParentsManage } from './ParentsManage'
+export { default as StudentsManage } from './StudentsManage'
+export { default as TeachersManage } from './TeachersManage'
+export { default as Subject } from './subject/Subject'
+export { default as Finence } from './Finence'
+export { default as Message } from './Message'
+export { default as Ads } from './Ads'
+export { default as Applications } from './Applications'
+export { default as HotelControl } from './HotelControl'
+

@@ -1,4 +1,4 @@
-import WithdrawSubject from './withdrawSubject';
+import WithdrawSubject from './WithdrawSubject';
 import WithdrawGroup from './WithdrawGroup';
 import AddSubject from './AddSubject';
 import AddGroup from './AddGroup';

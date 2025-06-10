@@ -15,7 +15,7 @@ const OtherCosts = ({ teacherId, onSuccess }) => {
 
   const fetchData = async () => {
     try {
-      const res = await axios.get(`http://localhost:4000/api/teacher/personal/${teacherId}`)
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/teacher/personal/${teacherId}`)
       if (res.data.success) {
         setTeacher(res.data.teacher)
       } else {

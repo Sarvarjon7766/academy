@@ -32,14 +32,14 @@ const MessageForm = () => {
 
   const fetchTeacher = async () => {
     try {
-      const res = await axios.get("http://localhost:4000/api/teacher/getAll")
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/teacher/getAll`)
       setTeacher(res.data.teachers)
     } catch (error) {}
   }
 
   const fetchMessages = async () => {
     try {
-      const response = await axios.get("http://localhost:4000/api/message/getAll")
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/message/getAll`)
       setMessages(response.data.messages)
       setFilteredMessages(response.data.messages)
     } catch (error) {
@@ -56,10 +56,10 @@ const MessageForm = () => {
     setIsLoading(true)
     try {
       if (editId) {
-        await axios.put(`http://localhost:4000/api/message/update/${editId}`, formData)
+        await axios.put(`${import.meta.env.VITE_API_URL}/api/message/update/${editId}`, formData)
         setMessage("Xabar muvaffaqiyatli yangilandi!")
       } else {
-        await axios.post("http://localhost:4000/api/message/create", formData)
+        await axios.post(`${import.meta.env.VITE_API_URL}/api/message/create`, formData)
         setMessage("Xabar muvaffaqiyatli yuborildi!")
       }
       setFormData({ messageName: "", messageTitle: "", who_is: 0, teacher: "" })
@@ -86,7 +86,7 @@ const MessageForm = () => {
 
   const handleDeleteMessage = async (messageId) => {
     try {
-      await axios.delete(`http://localhost:4000/api/message/delete/${messageId}`)
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/message/delete/${messageId}`)
       fetchMessages()
     } catch (error) {
       console.error("Xatolik:", error)

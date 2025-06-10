@@ -10,7 +10,7 @@ const RoomAttachment = ({ studentId, onHotelChange }) => {
 
 	const fetchRooms = async () => {
 		try {
-			const res = await axios.get("http://localhost:4000/api/room/getAll")
+			const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/room/getAll`)
 			if (res.data.success) {
 				setRooms(res.data.data)
 				console.log(res.data.data)
@@ -39,7 +39,7 @@ const RoomAttachment = ({ studentId, onHotelChange }) => {
 
 	const handleAssignBed = async () => {
 		try {
-			const res = await axios.put(`http://localhost:4000/api/room/add-hotel/${studentId}`, {
+			const res = await axios.put(`${import.meta.env.VITE_API_URL}/api/room/add-hotel/${studentId}`, {
 				roomNumber: selectedRoom.roomNumber,
 				bedIndex: selectedBedIndex,
 			})

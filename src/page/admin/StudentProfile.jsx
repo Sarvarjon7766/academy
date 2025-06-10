@@ -22,8 +22,8 @@ const StudentProfile = ({ students }) => {
   const fetchAdditionalSubjects = async () => {
     try {
       const [subjectsRes, hostelRes] = await Promise.all([
-        axios.get("http://localhost:4000/api/addsubject/getAll"),
-        axios.get("http://localhost:4000/api/hostel/getAll"),
+        axios.get(`${import.meta.env.VITE_API_URL}/api/addsubject/getAll`),
+        axios.get(`${import.meta.env.VITE_API_URL}/api/hostel/getAll`),
       ]);
 
       let combinedData = [
@@ -53,7 +53,7 @@ const StudentProfile = ({ students }) => {
   useEffect(() => {
     const fetchSubjects = async () => {
       try {
-        const res = await axios.get("http://localhost:4000/api/subject/getAll");
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/subject/getAll`);
         setSubjects(res.data.subject || []);
       } catch (error) {
         console.error("Error fetching subjects:", error);
@@ -142,7 +142,7 @@ const StudentProfile = ({ students }) => {
             {selectedStudent.photo && (
               <div className="mt-2">
                 <img
-                  src={`http://localhost:4000${selectedStudent.photo}`}
+                  src={`${import.meta.env.VITE_API_URL}/${selectedStudent.photo}`}
                   alt="Student Photo"
                   className="w-32 h-32 object-cover rounded-full"
                 />

@@ -16,7 +16,7 @@ const PrivilegedRegister = ({ subjects, additionalSubjects }) => {
     useEffect(() => {
         const fetchPrivilegedSubjects = async () => {
             try {
-                const res = await axios.get('http://localhost:4000/api/privilegedsubjects');
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/privilegedsubjects`);
                 setPrivilegedSubjects(res.data.privilegedSubjects);
             } catch (error) {
                 console.error('Error fetching privileged subjects:', error);

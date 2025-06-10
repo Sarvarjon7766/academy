@@ -19,7 +19,7 @@ const MainSubjectUpdate = ({ student }) => {
     const fetchSubjects = async () => {
       setLoadingSubjects(true)
       try {
-        const res = await axios.get("http://localhost:4000/api/subject/getAll")
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/subject/getAll`)
         setSubjects(res.data.subject || [])
       } catch {
         setError("Fanlarni yuklab bo'lmadi!")
@@ -37,7 +37,7 @@ const MainSubjectUpdate = ({ student }) => {
     const fetchStudentSubject = async () => {
       setLoadingStudentSubjects(true)
       try {
-        const res = await axios.get(`http://localhost:4000/api/student/main-subject/${student._id}`)
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/student/main-subject/${student._id}`)
         if (res.data.success) {
           const fetchedSubjects = res.data.main_subjects || []
           setMainSubject(fetchedSubjects)
@@ -82,7 +82,7 @@ const MainSubjectUpdate = ({ student }) => {
     if (!subjectId) return
 
     try {
-      const res = await axios.get(`http://localhost:4000/api/teacher/subject/${subjectId}`)
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/teacher/subject/${subjectId}`)
       const teachers = res.data.teachers || []
       setSelections(prev => {
         const updated = [...prev]
@@ -107,7 +107,7 @@ const MainSubjectUpdate = ({ student }) => {
     if (!teacherId || !subjectId) return
 
     try {
-      const res = await axios.get(`http://localhost:4000/api/group/groups/${teacherId}/${subjectId}`)
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/group/groups/${teacherId}/${subjectId}`)
       const groups = res.data.groups || []
       setSelections(prev => {
         const updated = [...prev]
@@ -156,7 +156,7 @@ const MainSubjectUpdate = ({ student }) => {
     try {
       setError(null)
       const res = await axios.put(
-        `http://localhost:4000/api/student/update-main/${student._id}`,
+        `${import.meta.env.VITE_API_URL}/api/student/update-main/${student._id}`,
         { newsubjects: selectedData, oldsubjects: main_subject },
         { headers: { "Content-Type": "application/json" } }
       )

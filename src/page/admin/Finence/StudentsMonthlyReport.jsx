@@ -20,7 +20,7 @@ const StudentsTableReport = () => {
   useEffect(() => {
     const fetchStudentPayment = async () => {
       try {
-        const res = await axios.get('http://localhost:4000/api/statistics/students-payment', {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/statistics/students-payment`, {
           params: { year:selectedYear, month:selectedMonth }
         })
       } catch (error) {

@@ -14,7 +14,7 @@ const SubjectAdd = ({ studentId, onclick }) => {
 	useEffect(() => {
 		const fetchStudentSubject = async () => {
 			try {
-				const res = await axios.get(`http://localhost:4000/api/student/main-subject/${studentId}`)
+				const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/student/main-subject/${studentId}`)
 				if (res.data.success) {
 					const subjects = res.data.data.main_subjects
 
@@ -52,7 +52,7 @@ const SubjectAdd = ({ studentId, onclick }) => {
 	useEffect(() => {
 		const fetchSubjects = async () => {
 			try {
-				const res = await axios.get("http://localhost:4000/api/subject/getAll")
+				const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/subject/getAll`)
 				const subject = res.data.subject
 				setSubjects(subject)
 			} catch {
@@ -72,7 +72,7 @@ const SubjectAdd = ({ studentId, onclick }) => {
 
 		if (subject) {
 			try {
-				const res = await axios.get(`http://localhost:4000/api/teacher/subject/${subject._id}`)
+				const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/teacher/subject/${subject._id}`)
 				updated[index].teachers = res.data.teachers || []
 			} catch {
 				setError("O'qituvchilarni yuklab bo'lmadi!")
@@ -91,7 +91,7 @@ const SubjectAdd = ({ studentId, onclick }) => {
 
 		if (teacher && updated[index].subject) {
 			try {
-				const res = await axios.get(`http://localhost:4000/api/group/groups/${teacher._id}/${updated[index].subject._id}`)
+				const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/group/groups/${teacher._id}/${updated[index].subject._id}`)
 				updated[index].groups = res.data.groups || []
 			} catch {
 				setError("Guruhlarni yuklab bo'lmadi!")
@@ -136,7 +136,7 @@ const SubjectAdd = ({ studentId, onclick }) => {
 		try {
 			setError(null)
 			const res = await axios.put(
-				`http://localhost:4000/api/student/add-main/${studentId}`,
+				`${import.meta.env.VITE_API_URL}/api/student/add-main/${studentId}`,
 				{ subjects: selectedData },
 				{ headers: { "Content-Type": "application/json" } }
 			)

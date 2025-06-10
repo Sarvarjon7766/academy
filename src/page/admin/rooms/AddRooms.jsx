@@ -12,7 +12,7 @@ const AddRooms = ({ onchange }) => {
 	const handleSubmit = async (e) => {
 		e.preventDefault()
 		try {
-			const res = await axios.post("http://localhost:4000/api/room/create", {
+			const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/room/create`, {
 				number: roomNumber,
 				capacity: roomCapacity
 			}, {

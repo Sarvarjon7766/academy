@@ -9,7 +9,7 @@ const SubjectAdd = ({ teacherId, onSuccess }) => {
 	useEffect(() => {
 		const checkTeacher = async () => {
 			try {
-				const res = await axios.get(`http://localhost:4000/api/teacher/check-subject/${teacherId}`)
+				const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/teacher/check-subject/${teacherId}`)
 				if (res.data.success && res.data.subjects.length !== 0) {
 					const selectedIds = res.data.subjects.map(sub => sub._id)
 					setSelectedSubjects(selectedIds) // faqat _id lar ro'yxati
@@ -21,7 +21,7 @@ const SubjectAdd = ({ teacherId, onSuccess }) => {
 
 		const fetchSubjects = async () => {
 			try {
-				const res = await axios.get("http://localhost:4000/api/subject/getAll")
+				const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/subject/getAll`)
 				setSubjects(res.data.subject)
 			} catch {
 				setError("Fanlarni yuklab bo‘lmadi!")
@@ -43,7 +43,7 @@ const SubjectAdd = ({ teacherId, onSuccess }) => {
 	// ✅ Saqlash tugmasi bosilganda
 	const handleSave = async () => {
 		try {
-			const res = await axios.post("http://localhost:4000/api/teacher/add-subjects", {
+			const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/teacher/add-subjects`, {
 				teacherId,
 				subjectIds: selectedSubjects,
 			})

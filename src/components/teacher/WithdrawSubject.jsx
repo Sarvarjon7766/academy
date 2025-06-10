@@ -15,7 +15,7 @@ const WithdrawSubject = () => {
 	const fetchData = async () => {
 		try {
 			const headers = token ? { Authorization: `Bearer ${token}` } : {}
-			const res = await axios.get(`http://localhost:4000/api/teacher/getSubjects`, { headers })
+			const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/teacher/getSubjects`, { headers })
 			if (res.data.success) {
 				setSubjects(res.data.subjects)
 				return

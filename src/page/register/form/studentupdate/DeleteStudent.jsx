@@ -6,7 +6,7 @@ const DeleteStudent = ({ student }) => {
 	const handleArchive = async () => {
 		alert(`${student.fullName} arxivga qo‘shildi!`)
 		try {
-			const res = await axios.delete(`http://localhost:4000/api/student/student-archived/${student._id}`)
+			const res = await axios.delete(`${import.meta.env.VITE_API_URL}/api/student/student-archived/${student._id}`)
 			if (res.data.success) (
 				navigate('/register/student-list')
 			)

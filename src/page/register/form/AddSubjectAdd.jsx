@@ -22,7 +22,7 @@ const AddSubjectAdd = ({ studentId, onclick }) => {
     useEffect(() => {
         const fetchSubjects = async () => {
             try {
-                const res = await axios.get("http://localhost:4000/api/subject/getAll")
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/subject/getAll`)
                 const allowedSubjects = ["Matematika", "Tarix", "Ona tili"]
                 const filteredSubjects = res.data.subject.filter(sub =>allowedSubjects.includes(sub.subjectName))
                 setSubjects(filteredSubjects)
@@ -37,7 +37,7 @@ const AddSubjectAdd = ({ studentId, onclick }) => {
     useEffect(() => {
         const fetchStudentSubject = async () => {
             try {
-                const res = await axios.get(`http://localhost:4000/api/student/additional-subject/${studentId}`)
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/student/additional-subject/${studentId}`)
                 if (res.data.success && Array.isArray(res.data.additionalSub)) {
                     const additionalSub = res.data.additionalSub
 
@@ -46,14 +46,14 @@ const AddSubjectAdd = ({ studentId, onclick }) => {
                             let teachers = []
                             let groups = []
                             try {
-                                const teacherRes = await axios.get(`http://localhost:4000/api/teacher/subject/${sub._id}`)
+                                const teacherRes = await axios.get(`${import.meta.env.VITE_API_URL}/api/teacher/subject/${sub._id}`)
                                 teachers = teacherRes.data.teachers || []
                             } catch {
                                 console.error("O'qituvchilarni olishda xatolik")
                             }
 
                             try {
-                                const groupRes = await axios.get(`http://localhost:4000/api/group/groups/${sub.teacher._id}/${sub._id}`)
+                                const groupRes = await axios.get(`${import.meta.env.VITE_API_URL}/api/group/groups/${sub.teacher._id}/${sub._id}`)
                                 groups = groupRes.data.groups || []
                             } catch {
                                 console.error("Guruhlarni olishda xatolik")
@@ -125,7 +125,7 @@ const AddSubjectAdd = ({ studentId, onclick }) => {
             newFormData[index].group = null
             newFormData[index].price = value.additionalPrice || ''
             try {
-                const res = await axios.get(`http://localhost:4000/api/teacher/subject/${value._id}`)
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/teacher/subject/${value._id}`)
                 newFormData[index].teachers = res.data.teachers || []
             } catch {
                 setError("O'qituvchilarni yuklab bo'lmadi!")
@@ -135,7 +135,7 @@ const AddSubjectAdd = ({ studentId, onclick }) => {
         if (type === "teacher") {
             newFormData[index].group = null
             try {
-                const res = await axios.get(`http://localhost:4000/api/group/groups/${value._id}/${newFormData[index].subject._id}`)
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/group/groups/${value._id}/${newFormData[index].subject._id}`)
                 newFormData[index].groups = res.data.groups || []
             } catch {
                 setError("Guruhlarni yuklab bo'lmadi!")
@@ -177,7 +177,7 @@ const AddSubjectAdd = ({ studentId, onclick }) => {
                 : { subjects: validSubjects, sunday: false }
 
             const res = await axios.put(
-                `http://localhost:4000/api/student/add-addition/${studentId}`,
+                `${import.meta.env.VITE_API_URL}/api/student/add-addition/${studentId}`,
                 payload,
                 { headers: { "Content-Type": "application/json" } }
             )

@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FaEdit, FaTrash } from "react-icons/fa";
 
-const API_URL = "http://localhost:4000/api/transport";
-
 const Transport = () => {
   const [transportName, setTransportName] = useState("");
   const [transportPrice, setTransportPrice] = useState("");
@@ -16,7 +14,7 @@ const Transport = () => {
 
   const fetchTransports = async () => {
     try {
-      const response = await axios.get(`${API_URL}/getAll`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/transport/getAll`);
       setTransports(response.data.transports);
     } catch (error) {
       console.error("Ma'lumotlarni olishda xatolik:", error);
@@ -33,7 +31,7 @@ const Transport = () => {
 
     try {
       if (editId) {
-        await axios.put(`${API_URL}/update/${editId}`, transportData);
+        await axios.put(`${import.meta.env.VITE_API_URL}/transport/update/${editId}`, transportData);
         setTransports((prev) =>
           prev.map((item) =>
             item._id === editId ? { ...item, ...transportData } : item
@@ -41,7 +39,7 @@ const Transport = () => {
         );
         setEditId(null);
       } else {
-        const response = await axios.post(`${API_URL}/create`, transportData);
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}/transport/create`, transportData);
         setTransports([...transports, response.data.transport]);
       }
 
@@ -54,7 +52,7 @@ const Transport = () => {
 
   const deleteTransport = async (id) => {
     try {
-      await axios.delete(`${API_URL}/delete/${id}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/transport/delete/${id}`);
       setTransports((prev) => prev.filter((item) => item._id !== id));
     } catch (error) {
       console.error("O‘chirishda xatolik:", error);

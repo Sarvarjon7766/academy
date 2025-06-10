@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FaEdit, FaTrash } from "react-icons/fa";
 
-const API_URL = "http://localhost:4000/api/hostel";
-
 const Hostel = () => {
   const [hostelName, setHostelName] = useState("");
   const [hostelPrice, setHostelPrice] = useState("");
@@ -12,7 +10,7 @@ const Hostel = () => {
 
   const fetchHostels = async () => {
     try {
-      const response = await axios.get(`${API_URL}/getAll`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/hostel/getAll`);
       setHostels(response.data.hostels);
     } catch (error) {
       console.error("Yotoqxonalarni olishda xatolik:", error);
@@ -29,7 +27,7 @@ const Hostel = () => {
         const hostelData = { hostelName, hostelPrice };
 
         if (editId) {
-          await axios.put(`${API_URL}/update/${editId}`, hostelData);
+          await axios.put(`${import.meta.env.VITE_API_URL}/hostel/update/${editId}`, hostelData);
           setHostels(
             hostels.map((hostel) =>
               hostel._id === editId ? { ...hostel, ...hostelData } : hostel
@@ -37,7 +35,7 @@ const Hostel = () => {
           );
           setEditId(null);
         } else {
-          const response = await axios.post(`${API_URL}/create`, hostelData);
+          const response = await axios.post(`${import.meta.env.VITE_API_URL}/hostel/create`, hostelData);
           setHostels([...hostels, response.data.newHostel]);
         }
 
@@ -53,7 +51,7 @@ const Hostel = () => {
 
   const deleteHostel = async (id) => {
     try {
-      await axios.delete(`${API_URL}/delete/${id}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/hostel/delete/${id}`);
       setHostels(hostels.filter((hostel) => hostel._id !== id));
     } catch (error) {
       console.error("Yotoqxona o‘chirishda xatolik:", error);

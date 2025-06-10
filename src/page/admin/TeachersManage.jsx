@@ -24,7 +24,7 @@ const TeachersManage = () => {
   useEffect(() => {
     const fetchTeacher = async () => {
       try {
-        const res = await axios.get('http://localhost:4000/api/teacher/getAll')
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/teacher/getAll`)
         if (res.data.success) {
           const filtered = res.data.teachers.filter(teacher => teacher.isAdmin === false)
           setTeachers(filtered)

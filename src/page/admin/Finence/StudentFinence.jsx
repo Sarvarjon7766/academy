@@ -70,7 +70,7 @@ const StudentFinance = () => {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const res = await axios.get('http://localhost:4000/api/payment/monthly-check', {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/payment/monthly-check`, {
           params: { year, month }
         })
 

@@ -23,7 +23,7 @@ const RelocationModal = ({ isOpen, groupId, studentId, onClose, onConfirm, stude
 				const headers = token ? { Authorization: `Bearer ${token}` } : {}
 
 				const res = await axios.get(
-					`http://localhost:4000/api/group/getSubject/${groupId}`,
+					`${import.meta.env.VITE_API_URL}/api/group/getSubject/${groupId}`,
 					{ headers }
 				)
 

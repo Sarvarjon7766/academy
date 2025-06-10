@@ -37,7 +37,7 @@ const Application = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:4000/api/application/create', formData);
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/application/create`, formData);
       setResponseMessage(response.data.message);
       setFormData({ fullName: '', phone: '', message: '' });
 

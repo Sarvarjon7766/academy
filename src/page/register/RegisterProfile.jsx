@@ -19,7 +19,7 @@ const RegisterProfile = () => {
 
     try {
       const headers = token ? { Authorization: `Bearer ${token}` } : {}
-      const res = await axios.get("http://localhost:4000/api/register/getOne", { headers })
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/register/getOne`, { headers })
 			console.log(res.data)
 
       if (res.status === 200) {
@@ -50,7 +50,7 @@ const RegisterProfile = () => {
 
     try {
       const res = await axios.put(
-        `http://localhost:4000/api/teacher/changePassword/${user._id}`,
+        `${import.meta.env.VITE_API_URL}/api/teacher/changePassword/${user._id}`,
         { password },
         { headers: { Authorization: `Bearer ${token}` } }
       )

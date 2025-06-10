@@ -17,9 +17,9 @@ const OtherCosts = ({ studentId, onclick, onHotelChange }) => {
       try {
         setYuklanmoqda(true)
         const [yotoqxonaRes, mahsulotRes, transportRes] = await Promise.all([
-          axios.get(`http://localhost:4000/api/hostel/getAll`),
-          axios.get(`http://localhost:4000/api/product/getAll`),
-          axios.get(`http://localhost:4000/api/transport/getAll`),
+          axios.get(`${import.meta.env.VITE_API_URL}/api/hostel/getAll`),
+          axios.get(`${import.meta.env.VITE_API_URL}/api/product/getAll`),
+          axios.get(`${import.meta.env.VITE_API_URL}/api/transport/getAll`),
         ])
 
         setXizmatlar({
@@ -73,7 +73,7 @@ const OtherCosts = ({ studentId, onclick, onHotelChange }) => {
     console.log('Salom')
     console.log(tanlanganXizmatlar)
     try {
-      const res = await axios.put(`http://localhost:4000/api/student/monthly-payment/${studentId}`, {
+      const res = await axios.put(`${import.meta.env.VITE_API_URL}/api/student/monthly-payment/${studentId}`, {
         userId: studentId,
         xizmatlar: tanlanganXizmatlar,
       })

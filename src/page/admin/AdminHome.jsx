@@ -103,7 +103,7 @@ const AdminHome = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get('http://localhost:4000/api/statistics/getStatistiks')
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/statistics/getStatistiks`)
         if (res.data.success) {
           setStudents(res.data.student)
           setTeachers(res.data.teacher)
@@ -119,7 +119,7 @@ const AdminHome = () => {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const res = await axios.get('http://localhost:4000/api/payment/monthly-check')
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/payment/monthly-check`)
 
         if (res.data.success) {
           const {

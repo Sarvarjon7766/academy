@@ -44,7 +44,7 @@ const EmployerRegister = () => {
 			}
 
 			const res = await axios.post(
-				'http://localhost:4000/api/employer/create',
+				`${import.meta.env.VITE_API_URL}/api/employer/create`,
 				dataToSend,
 				{
 					headers: { 'Content-Type': 'application/json' },

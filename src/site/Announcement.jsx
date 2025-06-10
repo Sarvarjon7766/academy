@@ -8,7 +8,7 @@ const Announcement = () => {
   useEffect(() => {
     const fetchAds = async () => {
       try {
-        const response = await axios.get("http://localhost:4000/api/ads/getAll");
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/ads/getAll`);
         if (response.data.success) {
           setAds(response.data.alldata);
         }
@@ -65,7 +65,7 @@ const Announcement = () => {
                 <div className="bg-white rounded-2xl shadow-2xl p-5 flex flex-col items-center text-center w-full max-w-sm transition-transform hover:scale-105 duration-500">
                   {ad.photo && (
                     <img
-                      src={`http://localhost:4000${ad.photo}`}
+                      src={`${import.meta.env.VITE_API_URL}/${ad.photo}`}
                       alt={ad.title}
                       className="w-full h-52 object-contain rounded-lg mb-4"
                     />

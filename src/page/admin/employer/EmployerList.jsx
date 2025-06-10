@@ -9,7 +9,7 @@ const EmployerList = () => {
   useEffect(() => {
     const fetchEmployers = async () => {
       try {
-        const res = await axios.get('http://localhost:4000/api/employer/getAll');
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/employer/getAll`);
         if (res.data.success) {
           setEmployers(res.data.employer);
         }

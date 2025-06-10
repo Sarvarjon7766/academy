@@ -62,14 +62,14 @@ const TeacherRegister = () => {
     if (teacher && section !== undefined) {
       // teacher va section mavjud bo'lsa PUT so'rov
       res = await axios.put(
-        `http://localhost:4000/api/teacher/create-personal/${teacher._id}`, // update endpoint, o'zgartiring kerak bo'lsa
+        `${import.meta.env.VITE_API_URL}/api/teacher/create-personal/${teacher._id}`, // update endpoint, o'zgartiring kerak bo'lsa
         formData,
         { headers: { "Content-Type": "application/json" } }
       )
     } else {
       // yo'q bo'lsa POST so'rov yuboriladi
       res = await axios.post(
-        "http://localhost:4000/api/teacher/create-personal",
+        `${import.meta.env.VITE_API_URL}/api/teacher/create-personal`,
         formData,
         { headers: { "Content-Type": "application/json" } }
       )

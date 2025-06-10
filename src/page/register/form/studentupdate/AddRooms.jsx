@@ -13,8 +13,8 @@ useEffect(() => {
 	const fetchData = async () => {
 		try {
 			const [roomRes, assignedRes] = await Promise.all([
-				axios.get('http://localhost:4000/api/room/getAll'),
-				axios.get(`http://localhost:4000/api/room/check-student/${studentId}`),
+				axios.get(`${import.meta.env.VITE_API_URL}/api/room/getAll`),
+				axios.get(`${import.meta.env.VITE_API_URL}/api/room/check-student/${studentId}`),
 			]);
 
 			// Xonalar
@@ -59,7 +59,7 @@ useEffect(() => {
 	// Biriktirish
 	const handleAssignBed = async () => {
 		try {
-			const res = await axios.put(`http://localhost:4000/api/room/add-hotel/${studentId}`, {
+			const res = await axios.put(`${import.meta.env.VITE_API_URL}/api/room/add-hotel/${studentId}`, {
 				roomNumber: selectedRoom.roomNumber,
 				bedIndex: selectedBedIndex,
 			});

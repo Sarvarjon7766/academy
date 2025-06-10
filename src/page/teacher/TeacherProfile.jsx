@@ -19,7 +19,7 @@ const TeacherProfile = () => {
 
     try {
       const headers = token ? { Authorization: `Bearer ${token}` } : {}
-      const res = await axios.get("http://localhost:4000/api/teacher/getOne", { headers })
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/teacher/getOne`, { headers })
 
       if (res.status === 200) {
         setUser(res.data.user)
@@ -49,7 +49,7 @@ const TeacherProfile = () => {
 
     try {
       const res = await axios.put(
-        `http://localhost:4000/api/teacher/changePassword/${user._id}`,
+        `${import.meta.env.VITE_API_URL}/api/teacher/changePassword/${user._id}`,
         { password },
         { headers: { Authorization: `Bearer ${token}` } }
       )

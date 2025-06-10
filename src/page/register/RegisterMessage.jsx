@@ -16,7 +16,7 @@ const RegisterMessage = () => {
 		}
 		try {
 			const headers = token ? { Authorization: `Bearer ${token}` } : {}
-			const res = await axios.get(`http://localhost:4000/api/message/getTeacher`, { headers })
+			const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/message/getTeacher`, { headers })
 			if (res.status === 200) {
 				setMessage(res.data.messages)
 			} else {
@@ -38,7 +38,7 @@ const RegisterMessage = () => {
 	const handlePersonal = async() => {
 		try {
 			const headers = token ? { Authorization: `Bearer ${token}` } : {}
-			const res = await axios.get(`http://localhost:4000/api/message/personal`, { headers })
+			const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/message/personal`, { headers })
 			if (res.status === 200) {
 				setMessage(res.data.messages)
 			} else {

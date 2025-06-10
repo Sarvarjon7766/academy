@@ -18,7 +18,7 @@ function Ads() {
   }, [])
 
   const fetchAds = () => {
-    axios.get('http://localhost:4000/api/ads/getAll')
+    axios.get(`${import.meta.env.VITE_API_URL}/api/ads/getAll`)
       .then((response) => {
         setAds(response.data.alldata)
       })
@@ -47,7 +47,7 @@ function Ads() {
     form.append('oldPhoto', formData.existingPhoto)
 
     if (editingAdId) {
-      axios.put(`http://localhost:4000/api/ads/update/${editingAdId}`, form)
+      axios.put(`${import.meta.env.VITE_API_URL}/api/ads/update/${editingAdId}`, form)
         .then((response) => {
           setAds(ads.map(ad => (ad._id === editingAdId ? response.data.updatedAd : ad)))
           setMessage({ text: 'E\'lon muvaffaqiyatli yangilandi!', success: true })
@@ -59,7 +59,7 @@ function Ads() {
           setMessage({ text: 'E\'lonni yangilashda xatolik yuz berdi.', success: false })
         })
     } else {
-      axios.post('http://localhost:4000/api/ads/create', form)
+      axios.post(`${import.meta.env.VITE_API_URL}/api/ads/create`, form)
         .then((response) => {
           setAds([...ads, response.data.newAd])
           setMessage({ text: 'E\'lon muvaffaqiyatli joylandi!', success: true })
@@ -74,7 +74,7 @@ function Ads() {
   }
 
   const handleDelete = (adId, photo) => {
-    axios.delete(`http://localhost:4000/api/ads/delete/${adId}`, { data: { photo: photo } })
+    axios.delete(`${import.meta.env.VITE_API_URL}/api/ads/delete/${adId}`, { data: { photo: photo } })
       .then(() => {
         setAds((prevAds) => prevAds.filter(ad => ad._id !== adId))
         setMessage({ text: 'E\'lon muvaffaqiyatli o\'chirildi!', success: true })

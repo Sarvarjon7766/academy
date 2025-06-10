@@ -21,9 +21,9 @@ const LoginPage = () => {
     e.preventDefault();
     try {
       let url;
-      if (role === 1) url = 'http://localhost:4000/api/teacher/login';
-      else if (role === 2) url = 'http://localhost:4000/api/register/login';
-      else if (role === 3) url = 'http://localhost:4000/api/parent/login';
+      if (role === 1) url = `${import.meta.env.VITE_API_URL}/api/teacher/login`;
+      else if (role === 2) url = `${import.meta.env.VITE_API_URL}/api/register/login`;
+      else if (role === 3) url = `${import.meta.env.VITE_API_URL}/api/parent/login`;
       else {
         setDataError("Noto'g'ri rol tanladingiz");
         return;

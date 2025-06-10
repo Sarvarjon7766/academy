@@ -29,7 +29,7 @@ const MonthlyReport = () => {
 
 	useEffect(() => {
 		const fetchStatistiks = async()=>{
-			const res = await axios.get('http://localhost:4000/api/statistics/teacher-payment',{
+			const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/statistics/teacher-payment`,{
 				params:{
 					year,month
 				}

@@ -72,7 +72,7 @@ const Attendance = () => {
 			const data = { attendance, gId }
 			console.log(attendance)
 			const res = await axios.post(
-				"http://localhost:4000/api/attandance/create",
+				`${import.meta.env.VITE_API_URL}/api/attandance/create`,
 				data,
 				{ headers }
 			)

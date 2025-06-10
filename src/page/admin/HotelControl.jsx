@@ -10,7 +10,7 @@ const HotelControl = () => {
 
   const fetchRooms = async () => {
     try {
-      const res = await axios.get("http://localhost:4000/api/room/getAll")
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/room/getAll`)
       if (res.data.success) {
         setRooms(res.data.data)
         setError("")

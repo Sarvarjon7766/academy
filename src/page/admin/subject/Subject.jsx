@@ -5,8 +5,6 @@ import Transport from './Transport';
 import Hostel from './Hostel';
 import MealCost from './MealCost';
 
-const API_URL = "http://localhost:4000/api/subject";
-
 const Subject = () => {
   const [subjectName, setSubjectName] = useState("");
   const [mainPrice, setSubjectPrice] = useState("");
@@ -19,7 +17,7 @@ const Subject = () => {
 
   const fetchSubjects = async () => {
     try {
-      const response = await axios.get(`${API_URL}/getAll`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/subject/getAll`);
       setSubjects(response.data.subject);
     } catch (error) {
       console.error("Subjectlarni olishda xatolik:", error);
@@ -35,10 +33,10 @@ const Subject = () => {
       try {
         const subjectData = { subjectName, mainPrice, additionalPrice };
         if (editId) {
-          await axios.put(`${API_URL}/update/${editId}`, subjectData);
+          await axios.put(`${import.meta.env.VITE_API_URL}/subject/update/${editId}`, subjectData);
           setEditId(null);
         } else {
-          await axios.post(`${API_URL}/create`, subjectData);
+          await axios.post(`${import.meta.env.VITE_API_URL}/subject/create`, subjectData);
         }
         setSubjectName("");
         setSubjectPrice("");
@@ -52,7 +50,7 @@ const Subject = () => {
 
   const deleteSubject = async (id) => {
     try {
-      await axios.delete(`${API_URL}/delete/${id}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/subject/delete/${id}`);
       fetchSubjects();
     } catch (error) {
       console.error("Subject o‘chirishda xatolik:", error);

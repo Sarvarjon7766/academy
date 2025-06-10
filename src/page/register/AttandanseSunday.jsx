@@ -18,7 +18,7 @@ const AttendanceSunday = () => {
 		if (today.getDay() !== 0) {
 			setShow(true)
 			setIsDate(new Date().setHours(0, 0, 0, 0))
-			axios.get('http://localhost:4000/api/student/getSunday')
+			axios.get(`${import.meta.env.VITE_API_URL}/api/student/getSunday`)
 				.then(res => {
 					if (res.data.success) {
 						setStudents(res.data.data)
@@ -65,7 +65,7 @@ const AttendanceSunday = () => {
 			const headers = token ? { Authorization: `Bearer ${token}` } : {}
 			const data = { attendance }
 			const res = await axios.post(
-				"http://localhost:4000/api/attandance/create-sunday",
+				`${import.meta.env.VITE_API_URL}/api/attandance/create-sunday`,
 				data,
 				{ headers }
 			)

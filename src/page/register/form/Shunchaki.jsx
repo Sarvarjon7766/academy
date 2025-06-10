@@ -15,7 +15,7 @@ const Shunchaki = ({ studentId, onExit }) => {
       setLoading(true)
       setError("")
       try {
-        const res = await axios.get(`http://localhost:4000/api/student/getAll`)
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/student/getAll`)
         if (res.data.success && res.data.students) {
           const found = res.data.students.find(stu => stu._id === studentId)
           if (found) {

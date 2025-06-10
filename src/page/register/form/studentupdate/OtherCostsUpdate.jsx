@@ -23,9 +23,9 @@ const OtherCostsUpdate = ({ student }) => {
 
 			try {
 				const [hostelRes, productRes, transportRes] = await Promise.all([
-					axios.get("http://localhost:4000/api/hostel/getAll"),
-					axios.get("http://localhost:4000/api/product/getAll"),
-					axios.get("http://localhost:4000/api/transport/getAll"),
+					axios.get(`${import.meta.env.VITE_API_URL}/api/hostel/getAll`),
+					axios.get(`${import.meta.env.VITE_API_URL}/api/product/getAll`),
+					axios.get(`${import.meta.env.VITE_API_URL}/api/transport/getAll`),
 				]);
 
 				const selectedIds = {
@@ -87,7 +87,7 @@ const OtherCostsUpdate = ({ student }) => {
 
 		try {
 			const res = await axios.put(
-				`http://localhost:4000/api/student/other-cost-update/${studentId}`,
+				`${import.meta.env.VITE_API_URL}/api/student/other-cost-update/${studentId}`,
 				{
 					xizmatlar: selectedServices,
 				}

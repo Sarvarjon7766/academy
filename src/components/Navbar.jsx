@@ -19,7 +19,7 @@ const Navbar = ({ toggleSidebar }) => {
 
     try {
       const headers = token ? { Authorization: `Bearer ${token}` } : {}
-      const res = await axios.get('http://localhost:4000/api/profile/getOne', { headers })
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/profile/getOne`, { headers })
 
       if (res.status === 200) {
         setUser(res.data.user)

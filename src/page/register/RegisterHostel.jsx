@@ -6,7 +6,7 @@ const RegisterHostel = () => {
 
 	useEffect(() => {
 		const fetchHostel = async () => {
-			const res = await axios.get('http://localhost:4000/api/room/getAll')
+			const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/room/getAll`)
 			console.log(res.data)
 			if (res.data && res.data.success) {
 				setHostel(res.data.data)

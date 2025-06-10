@@ -9,7 +9,7 @@ const StudentStatusManager = () => {
 
 	// Talabalar ro'yxatini olish
 	useEffect(() => {
-		axios.get('http://localhost:4000/api/student/getAll')
+		axios.get(`${import.meta.env.VITE_API_URL}/api/student/getAll`)
 			.then(res => setStudents(res.data.students))
 			.catch(err => alert("Talabalarni olishda xatolik: " + err.message))
 	}, [])
@@ -24,7 +24,7 @@ const StudentStatusManager = () => {
 		if (!selectedId) return alert("Iltimos, talabani tanlang!")
 
 		try {
-			const res = await axios.patch(`http://localhost:4000/api/student/${selectedId}/status`, {
+			const res = await axios.patch(`${import.meta.env.VITE_API_URL}/api/student/${selectedId}/status`, {
 				status: 'removed',
 				comment,
 			})

@@ -25,13 +25,13 @@ const AdditionalSubjectUpdate = ({ student }) => {
 		const loadInitialData = async () => {
 			try {
 				// Fetch subjects
-				const subjectRes = await axios.get("http://localhost:4000/api/subject/getAll")
+				const subjectRes = await axios.get(`${import.meta.env.VITE_API_URL}/api/subject/getAll`)
 				const allowed = ["Matematika", "Tarix", "Ona tili"]
 				const filtered = subjectRes.data.subject.filter(s => allowed.includes(s.subjectName))
 				setSubjects(filtered)
 
 				// Fetch student's current subjects
-				const studentRes = await axios.get(`http://localhost:4000/api/student/additional-subject/${studentId}`)
+				const studentRes = await axios.get(`${import.meta.env.VITE_API_URL}/api/student/additional-subject/${studentId}`)
 				if (studentRes.data.success && Array.isArray(studentRes.data.additionalSub)) {
 					const additionalSub = studentRes.data.additionalSub
 					const updatedForm = await Promise.all(
@@ -39,9 +39,9 @@ const AdditionalSubjectUpdate = ({ student }) => {
 							let teachers = []
 							let groups = []
 							try {
-								const tRes = await axios.get(`http://localhost:4000/api/teacher/subject/${sub._id}`)
+								const tRes = await axios.get(`${import.meta.env.VITE_API_URL}/api/teacher/subject/${sub._id}`)
 								teachers = tRes.data.teachers || []
-								const gRes = await axios.get(`http://localhost:4000/api/group/groups/${sub.teacher._id}/${sub._id}`)
+								const gRes = await axios.get(`${import.meta.env.VITE_API_URL}/api/group/groups/${sub.teacher._id}/${sub._id}`)
 								groups = gRes.data.groups || []
 							} catch (err) {
 								console.error("Teacher or group fetch error", err)
@@ -90,13 +90,13 @@ const AdditionalSubjectUpdate = ({ student }) => {
 				newForm[index].teacher = null
 				newForm[index].group = null
 				newForm[index].price = value?.additionalPrice || ''
-				const res = await axios.get(`http://localhost:4000/api/teacher/subject/${value._id}`)
+				const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/teacher/subject/${value._id}`)
 				newForm[index].teachers = res.data.teachers || []
 				newForm[index].groups = []
 			}
 			if (type === "teacher") {
 				newForm[index].group = null
-				const res = await axios.get(`http://localhost:4000/api/group/groups/${value._id}/${newForm[index].subject._id}`)
+				const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/group/groups/${value._id}/${newForm[index].subject._id}`)
 				newForm[index].groups = res.data.groups || []
 			}
 		} catch (err) {
@@ -134,7 +134,7 @@ const AdditionalSubjectUpdate = ({ student }) => {
 				: { subjects: valid, sunday: false }
 
 			const res = await axios.put(
-				`http://localhost:4000/api/student/update-addition/${studentId}`,
+				`${import.meta.env.VITE_API_URL}/api/student/update-addition/${studentId}`,
 				payload,
 				{ headers: { "Content-Type": "application/json" } }
 			)

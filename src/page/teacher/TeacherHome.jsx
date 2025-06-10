@@ -28,7 +28,7 @@ const TeacherHome = () => {
 			}
 			try {
 				const headers = { Authorization: `Bearer ${token}` }
-				const res = await axios.get(`http://localhost:4000/api/teacher/getSubjects`, { headers })
+				const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/teacher/getSubjects`, { headers })
 				setTeacherId(res.data.teacherid)
 			} catch (error) {
 				if (error.response?.status === 401 || error.response?.status === 403) {
@@ -44,7 +44,7 @@ const TeacherHome = () => {
 	const fetchData = async () => {
 		try {
 			const headers = token ? { Authorization: `Bearer ${token}` } : {}
-			const res = await axios.get(`http://localhost:4000/api/teacher/getSubjects`, { headers })
+			const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/teacher/getSubjects`, { headers })
 			setSubjects(res.data.subjects || [])
 			setHeaders(headers)
 		} catch (error) {
@@ -69,7 +69,7 @@ const TeacherHome = () => {
 
 	const handleGroup = async (subject) => {
 		try {
-			const res = await axios.get(`http://localhost:4000/api/group/groups/${subject._id}`, { headers })
+			const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/group/groups/${subject._id}`, { headers })
 			if (res.data.groups.length !== 0) {
 				setGroups(res.data.groups)
 			} else {
@@ -85,7 +85,7 @@ const TeacherHome = () => {
 	const handleCreateGroup = async (subject, formDatas) => {
 		try {
 			const res = await axios.post(
-				`http://localhost:4000/api/group/create-group/${subject._id}`,
+				`${import.meta.env.VITE_API_URL}/api/group/create-group/${subject._id}`,
 				formDatas,
 				{ headers }
 			)
@@ -110,8 +110,8 @@ const TeacherHome = () => {
 		try {
 			const headers = token ? { Authorization: `Bearer ${token}` } : {}
 			const [res, response] = await Promise.all([
-				axios.get(`http://localhost:4000/api/group/groups-v3/${groupId}`),
-				axios.get(`http://localhost:4000/api/attandance/checking/${groupId}`, { headers })
+				axios.get(`${import.meta.env.VITE_API_URL}/api/group/groups-v3/${groupId}`),
+				axios.get(`${import.meta.env.VITE_API_URL}/api/attandance/checking/${groupId}`, { headers })
 			])
 			console.log(res.data)
 

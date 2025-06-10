@@ -35,7 +35,7 @@ const StudentAttendanceChart = () => {
     try {
       const headers = token ? { Authorization: `Bearer ${token}` } : {}
       const res = await axios.get(
-        `http://localhost:4000/api/attandance/search-lowachieving/${selectedYear}/${selectedMonthNumber}`,
+        `${import.meta.env.VITE_API_URL}/api/attandance/search-lowachieving/${selectedYear}/${selectedMonthNumber}`,
         { headers }
       )
       if (res.status === 200) {

@@ -20,7 +20,7 @@ const RegisterPayment = () => {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const res = await axios.get('http://localhost:4000/api/student/getAll')
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/student/getAll`)
         if (res.data.success) {
           setStudents(res.data.students)
         }
@@ -39,7 +39,7 @@ const RegisterPayment = () => {
         return
       }
       try {
-        const res = await axios.get('http://localhost:4000/api/payment/check', {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/payment/check`, {
           params: { studentId: selectedStudentId, year, month },
         })
         setPaymentInfo(res.data.payment || null)
@@ -74,7 +74,7 @@ const RegisterPayment = () => {
     }
     try {
       setLoading(true)
-      const res = await axios.post('http://localhost:4000/api/payment/pay', {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/payment/pay`, {
         studentId: selectedStudentId,
         year,
         month,
@@ -86,7 +86,7 @@ const RegisterPayment = () => {
         alert("To'lov muvaffaqiyatli amalga oshirildi!")
         setAmount('')
         // To'lov ma'lumotlarini yangilash
-        const resCheck = await axios.get('http://localhost:4000/api/payment/check', {
+        const resCheck = await axios.get(`${import.meta.env.VITE_API_URL}/api/payment/check`, {
           params: { studentId: selectedStudentId, year, month },
         })
         setPaymentInfo(resCheck.data.payment || null)

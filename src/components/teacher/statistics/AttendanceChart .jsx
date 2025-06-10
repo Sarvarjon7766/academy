@@ -18,7 +18,7 @@ const TotalStudent = () => {
   const fetchData = async () => {
     try {
       const headers = token ? { Authorization: `Bearer ${token}` } : {}
-      const res = await axios.get(`http://localhost:4000/api/group/search-group`, { headers })
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/group/search-group`, { headers })
 
       if (res.status === 200) {
         const newAttendanceDates = res.data.groups.map(group => ({

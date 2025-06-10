@@ -28,7 +28,7 @@ const Finence = () => {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const res = await axios.get('http://localhost:4000/api/student/getAll')
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/student/getAll`)
         if (res.data.success) {
           setStudents(res.data.students)
         }

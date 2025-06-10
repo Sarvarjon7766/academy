@@ -43,7 +43,7 @@ const PersonalUpdate = ({ student }) => {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault()
-		const res = await axios.put(`http://localhost:4000/api/student/update-personal/${student._id}`, formData, {
+		const res = await axios.put(`${import.meta.env.VITE_API_URL}/api/student/update-personal/${student._id}`, formData, {
 			headers: { "Content-Type": "multipart/form-data" }
 		})
 		if (res.data.success) {

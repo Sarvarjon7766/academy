@@ -15,7 +15,7 @@ const Applications = () => {
   });
 
   useEffect(() => {
-    fetch("http://localhost:4000/api/application/getAll")
+    fetch(`${import.meta.env.VITE_API_URL}/api/application/getAll`)
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
@@ -35,7 +35,7 @@ const Applications = () => {
   const toggleContacted = async (id, currentStatus) => {
     try {
       const response = await fetch(
-        `http://localhost:4000/api/application/update/${id}`,
+        `${import.meta.env.VITE_API_URL}/api/application/update/${id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },

@@ -15,7 +15,7 @@ const RegisterRefund = () => {
 	useEffect(() => {
 		const fetchStudents = async () => {
 			try {
-				const res = await axios.get('http://localhost:4000/api/student/getAll')
+				const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/student/getAll`)
 				if (res.data.success) {
 					setStudents(res.data.students)
 				}
@@ -38,7 +38,7 @@ const RegisterRefund = () => {
 
 	const handlerCheck = async () => {
 		try {
-			const res = await axios.get('http://localhost:4000/api/attandance/calculate', {
+			const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/attandance/calculate`, {
 				params: {
 					studentId: selectedStudentId,
 					date
@@ -48,7 +48,7 @@ const RegisterRefund = () => {
 			if (res.data.success) {
 				const months = res.data.result
 
-				const response = await axios.post('http://localhost:4000/api/payment/calculate', {
+				const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/payment/calculate`, {
 					months,
 					studentId: selectedStudentId
 				})
@@ -94,7 +94,7 @@ const RegisterRefund = () => {
 				balance:true
 			}
 
-			const res = await axios.post('http://localhost:4000/api/payment/balance', payload)
+			const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/payment/balance`, payload)
 
 			if (res.data.success) {
 				alert("✅ To‘lov muvaffaqiyatli amalga oshirildi.")

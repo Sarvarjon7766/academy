@@ -11,7 +11,7 @@ const AddSubjectAdd = ({ teacherId, onSuccess }) => {
   useEffect(() => {
     const fetchSalary = async () => {
       try {
-        const res = await axios.get(`http://localhost:4000/api/teacher/check-salary/${teacherId}`)
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/teacher/check-salary/${teacherId}`)
         if (res.data.success && res.data.salary) {
 					console.log(res.data)
           setSalary(Number(res.data.salary.salary) || 0)
@@ -34,7 +34,7 @@ const AddSubjectAdd = ({ teacherId, onSuccess }) => {
     }
 
     try {
-      const res = await axios.post("http://localhost:4000/api/teacher/add-salary", {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/teacher/add-salary`, {
         teacherId,
         salary: showSalaryInput ? salary : 0,
         share_of_salary: showShareInput ? shareOfSalary : 0,

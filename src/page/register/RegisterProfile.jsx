@@ -1,7 +1,7 @@
 import axios from "axios"
 import React, { useCallback, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import photo from '../../../../backend/static/0b47bf00-52d1-41a9-ab70-d08b03fbd6f0.jpg'
+// import photo from '../../../../backend/static/0b47bf00-52d1-41a9-ab70-d08b03fbd6f0.jpg'
 
 const RegisterProfile = () => {
   const token = localStorage.getItem("token")

@@ -14,7 +14,7 @@ const Transport = () => {
 
   const fetchTransports = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/transport/getAll`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/transport/getAll`);
       setTransports(response.data.transports);
     } catch (error) {
       console.error("Ma'lumotlarni olishda xatolik:", error);
@@ -31,7 +31,7 @@ const Transport = () => {
 
     try {
       if (editId) {
-        await axios.put(`${import.meta.env.VITE_API_URL}/transport/update/${editId}`, transportData);
+        await axios.put(`${import.meta.env.VITE_API_URL}/api/transport/update/${editId}`, transportData);
         setTransports((prev) =>
           prev.map((item) =>
             item._id === editId ? { ...item, ...transportData } : item
@@ -39,7 +39,7 @@ const Transport = () => {
         );
         setEditId(null);
       } else {
-        const response = await axios.post(`${import.meta.env.VITE_API_URL}/transport/create`, transportData);
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/transport/create`, transportData);
         setTransports([...transports, response.data.transport]);
       }
 
@@ -52,7 +52,7 @@ const Transport = () => {
 
   const deleteTransport = async (id) => {
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/transport/delete/${id}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/transport/delete/${id}`);
       setTransports((prev) => prev.filter((item) => item._id !== id));
     } catch (error) {
       console.error("O‘chirishda xatolik:", error);

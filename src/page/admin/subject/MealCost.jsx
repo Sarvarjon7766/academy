@@ -12,7 +12,7 @@ const MealCost = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/product/getAll`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/product/getAll`);
       setProducts(response.data.products);
     } catch (error) {
       console.error("Ovqat ma'lumotlarini olishda xatolik:", error);
@@ -29,7 +29,7 @@ const MealCost = () => {
         const productData = { productName, productPrice };
 
         if (editId) {
-          await axios.put(`${import.meta.env.VITE_API_URL}/product/update/${editId}`, productData);
+          await axios.put(`${import.meta.env.VITE_API_URL}/api/product/update/${editId}`, productData);
           setProducts(
             products.map((product) =>
               product._id === editId ? { ...product, ...productData } : product
@@ -37,7 +37,7 @@ const MealCost = () => {
           );
           setEditId(null);
         } else {
-          const response = await axios.post(`${import.meta.env.VITE_API_URL}/product/create`, productData);
+          const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/product/create`, productData);
           setProducts([...products, response.data.product]);
         }
 
@@ -53,7 +53,7 @@ const MealCost = () => {
 
   const deleteProduct = async (id) => {
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/product/delete/${id}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/product/delete/${id}`);
       setProducts(products.filter((product) => product._id !== id));
     } catch (error) {
       console.error("Ovqat o‘chirishda xatolik:", error);

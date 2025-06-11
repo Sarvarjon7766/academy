@@ -17,7 +17,7 @@ const Subject = () => {
 
   const fetchSubjects = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/subject/getAll`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/subject/getAll`);
       setSubjects(response.data.subject);
     } catch (error) {
       console.error("Subjectlarni olishda xatolik:", error);
@@ -33,10 +33,10 @@ const Subject = () => {
       try {
         const subjectData = { subjectName, mainPrice, additionalPrice };
         if (editId) {
-          await axios.put(`${import.meta.env.VITE_API_URL}/subject/update/${editId}`, subjectData);
+          await axios.put(`${import.meta.env.VITE_API_URL}/api/subject/update/${editId}`, subjectData);
           setEditId(null);
         } else {
-          await axios.post(`${import.meta.env.VITE_API_URL}/subject/create`, subjectData);
+          await axios.post(`${import.meta.env.VITE_API_URL}/api/subject/create`, subjectData);
         }
         setSubjectName("");
         setSubjectPrice("");
@@ -50,7 +50,7 @@ const Subject = () => {
 
   const deleteSubject = async (id) => {
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/subject/delete/${id}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/subject/delete/${id}`);
       fetchSubjects();
     } catch (error) {
       console.error("Subject o‘chirishda xatolik:", error);

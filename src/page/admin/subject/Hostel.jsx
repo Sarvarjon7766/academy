@@ -10,7 +10,7 @@ const Hostel = () => {
 
   const fetchHostels = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/hostel/getAll`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/hostel/getAll`);
       setHostels(response.data.hostels);
     } catch (error) {
       console.error("Yotoqxonalarni olishda xatolik:", error);
@@ -27,7 +27,7 @@ const Hostel = () => {
         const hostelData = { hostelName, hostelPrice };
 
         if (editId) {
-          await axios.put(`${import.meta.env.VITE_API_URL}/hostel/update/${editId}`, hostelData);
+          await axios.put(`${import.meta.env.VITE_API_URL}/api/hostel/update/${editId}`, hostelData);
           setHostels(
             hostels.map((hostel) =>
               hostel._id === editId ? { ...hostel, ...hostelData } : hostel
@@ -35,7 +35,7 @@ const Hostel = () => {
           );
           setEditId(null);
         } else {
-          const response = await axios.post(`${import.meta.env.VITE_API_URL}/hostel/create`, hostelData);
+          const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/hostel/create`, hostelData);
           setHostels([...hostels, response.data.newHostel]);
         }
 
@@ -51,7 +51,7 @@ const Hostel = () => {
 
   const deleteHostel = async (id) => {
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/hostel/delete/${id}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/hostel/delete/${id}`);
       setHostels(hostels.filter((hostel) => hostel._id !== id));
     } catch (error) {
       console.error("Yotoqxona o‘chirishda xatolik:", error);

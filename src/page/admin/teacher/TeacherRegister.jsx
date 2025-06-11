@@ -66,6 +66,7 @@ const TeacherRegister = () => {
         formData,
         { headers: { "Content-Type": "application/json" } }
       )
+
     } else {
       // yo'q bo'lsa POST so'rov yuboriladi
       res = await axios.post(
@@ -73,6 +74,7 @@ const TeacherRegister = () => {
         formData,
         { headers: { "Content-Type": "application/json" } }
       )
+      console.log(res.data)
     }
     
     alert(res.data.message)

@@ -1,17 +1,24 @@
 import axios from "axios"
 import { useEffect, useState } from "react"
 import { FaDownload } from "react-icons/fa6"
-import { utils } from "xlsx"
-import { writeFileXLSX } from "xlsx"
-
+import { utils, writeFileXLSX } from "xlsx"
 
 const MonthlyReport = () => {
+	const now = new Date()
+	const currentYear = now.getFullYear()
+	const currentMonth = now.getMonth() + 1
+
 	const [data, setData] = useState([])
 	const [activeTeacher, setActiveTeacher] = useState(null)
-	const [loadingId, setLoadingId] = useState(null) // Yangi: yuklanayotgan teacher ID
+	const [selectedYear, setSelectedYear] = useState(currentYear)
+	const [selectedMonth, setSelectedMonth] = useState(currentMonth)
+
+	const daysInMonth = new Date(selectedYear, selectedMonth, 0).getDate()
+	const days = Array.from({ length: daysInMonth }, (_, i) => String(i + 1).padStart(2, "0"))
 
 	useEffect(() => {
-		axios.get(`${import.meta.env.VITE_API_URL}/api/teacher/teacher-selery`)
+		axios
+			.get(`${import.meta.env.VITE_API_URL}/api/teacher/teacher-selery`)
 			.then((res) => setData(res.data.data))
 			.catch((err) => console.error("Xatolik:", err))
 	}, [])
@@ -26,45 +33,64 @@ const MonthlyReport = () => {
 		teacher.subjects.forEach((subject) => {
 			const ws = {}
 			const merges = []
+			const cols = []
 			let colOffset = 0
 			let maxRowCount = 0
 
+			const currentMonthDays = Array.from({ length: daysInMonth }, (_, i) => (i + 1).toString().padStart(2, "0"))
+
+			const borderStyle = {
+				top: { style: "thin" },
+				bottom: { style: "thin" },
+				left: { style: "thin" },
+				right: { style: "thin" },
+			}
+
 			subject.groups.forEach((group) => {
 				const startCol = colOffset
-				const headers = ["Talaba ismi", "Telefon", "ID", "Holati"]
+				const headers = ["№", "Ism Familiya", "Oyligi", ...currentMonthDays, "Hisoblanma", "To'lov qilingan"]
 
-				// Guruh nomi (1-qatordagi merged cell)
 				const mergeRange = {
 					s: { r: 0, c: startCol },
 					e: { r: 0, c: startCol + headers.length - 1 },
 				}
+
 				ws[utils.encode_cell(mergeRange.s)] = {
-					v: `Guruh: ${group.groupName}`,
-					s: {
-						fill: { fgColor: { rgb: "ADD8E6" } },
-						font: { bold: true },
-						alignment: { horizontal: "center" },
-					},
+					v: `Guruh: ${group.groupName} (${selectedYear}-${String(selectedMonth).padStart(2, "0")})`,
+					s: { font: { bold: true }, alignment: { horizontal: "center" }, border: borderStyle },
 				}
 				merges.push(mergeRange)
 
-				// Header row
 				headers.forEach((header, i) => {
 					const cell = utils.encode_cell({ r: 1, c: startCol + i })
-					ws[cell] = { v: header }
+					ws[cell] = {
+						v: header,
+						s: { font: { bold: true }, alignment: { horizontal: "center" }, border: borderStyle },
+					}
+					cols[startCol + i] = { wch: header.length }
 				})
 
-				// Student data
 				group.students.forEach((student, rowIdx) => {
+					const rowNumber = rowIdx + 1
+					const monthlyFee = student.fee != null ? student.fee.toString() : ""
+					const paymentStatus = student.paymentStatus || ""
+
 					const row = [
+						rowNumber.toString(),
 						student.fullName || "",
-						student.phone || "",
-						student.studentId || "",
-						student.status || "",
+						monthlyFee,
+						...currentMonthDays.map(() => ""),
+						"",
+						paymentStatus.toString(),
 					]
+
 					row.forEach((val, i) => {
 						const cell = utils.encode_cell({ r: rowIdx + 2, c: startCol + i })
-						ws[cell] = { v: val }
+						ws[cell] = { v: val, s: { border: borderStyle } }
+						const width = val.toString().length
+						if (!cols[startCol + i] || cols[startCol + i].wch < width) {
+							cols[startCol + i] = { wch: width }
+						}
 					})
 				})
 
@@ -74,26 +100,60 @@ const MonthlyReport = () => {
 
 			ws["!merges"] = merges
 			ws["!ref"] = `A1:${utils.encode_cell({ r: maxRowCount, c: colOffset })}`
+			ws["!cols"] = cols
+
 			utils.book_append_sheet(wb, ws, subject.subjectName.slice(0, 31))
 		})
 
 		writeFileXLSX(wb, `${teacher.teacherName}.xlsx`)
 	}
 
+	const yearOptions = Array.from({ length: 6 }, (_, i) => currentYear - 2 + i)
+	const monthOptions = Array.from({ length: 12 }, (_, i) => i + 1)
+
 	return (
-		<div className="mx-auto p-6 space-y-6">
+		<div className="max-w-full p-4 space-y-6">
+			{/* Filter */}
+			<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+				<div>
+					<label className="block text-sm font-medium mb-1">Yil</label>
+					<select
+						value={selectedYear}
+						onChange={(e) => setSelectedYear(Number(e.target.value))}
+						className="w-full border px-3 py-2 rounded-md"
+					>
+						{yearOptions.map((y) => (
+							<option key={y} value={y}>{y}</option>
+						))}
+					</select>
+				</div>
+				<div>
+					<label className="block text-sm font-medium mb-1">Oy</label>
+					<select
+						value={selectedMonth}
+						onChange={(e) => setSelectedMonth(Number(e.target.value))}
+						className="w-full border px-3 py-2 rounded-md"
+					>
+						{monthOptions.map((m) => (
+							<option key={m} value={m}>{String(m).padStart(2, '0')}</option>
+						))}
+					</select>
+				</div>
+			</div>
+
+			{/* O'qituvchilar */}
 			{data.map((teacher) => (
-				<div key={teacher.teacherId} className="border rounded-lg shadow bg-white p-6">
+				<div key={teacher.teacherId} className="border rounded-xl bg-white shadow p-5 space-y-4">
 					<div
-						className="cursor-pointer flex justify-between items-center"
+						className="cursor-pointer flex flex-col md:flex-row justify-between items-start md:items-center gap-3"
 						onClick={() => toggleTeacher(teacher.teacherId)}
 					>
-						<h2 className="text-xl font-bold text-gray-800">{teacher.teacherName}</h2>
+						<h2 className="text-xl font-bold">{teacher.teacherName}</h2>
 						<div className="flex flex-wrap gap-2">
 							{teacher.subjects.map((subject) => (
 								<span
 									key={subject.subjectId}
-									className="bg-blue-600 text-white text-sm font-semibold px-3 py-1 rounded-full shadow-sm"
+									className="bg-blue-600 text-white text-xs md:text-sm px-3 py-1 rounded-full"
 								>
 									{subject.subjectName}
 								</span>
@@ -102,54 +162,66 @@ const MonthlyReport = () => {
 					</div>
 
 					{activeTeacher === teacher.teacherId && (
-						<div className="mt-6 space-y-6">
-							<div className="flex justify-end mb-4">
+						<div className="space-y-6">
+							{/* Export Button */}
+							<div className="flex justify-end">
 								<button
 									onClick={() => exportToExcel(teacher)}
-									disabled={loadingId === teacher.teacherId}
-									className="bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-md shadow flex items-center gap-2"
+									className="bg-green-600 text-white px-4 py-2 rounded flex items-center gap-2"
 								>
-									<FaDownload />
+									<FaDownload /> Excel
 								</button>
 							</div>
 
+							{/* Fan va Guruhlar */}
 							{teacher.subjects.map((subject) => (
 								<div
 									key={subject.subjectId}
-									className="bg-blue-50 border border-blue-200 p-5 rounded-lg shadow-inner"
-								>
-									<h3 className="text-lg font-bold text-blue-700 text-center mb-4 border-b pb-2">
+									className="border border-blue-300 bg-blue-50 p-4 rounded-lg w-full max-w-7xl mx-auto">
+
+									<h3 className="text-center font-semibold text-blue-700 mb-3 border-b pb-1">
 										{subject.subjectName}
 									</h3>
 
 									{subject.groups.map((group) => (
-										<div
-											key={group.groupId}
-											className="bg-white border rounded-md shadow-sm p-4 mb-4"
-										>
-											<h4 className="text-md font-semibold text-gray-700 mb-3 text-center border-b pb-1">
+										<div key={group.groupId} className="mb-4 bg-white p-4 border rounded-lg">
+											<h4 className="text-center font-medium mb-2 border-b pb-1">
 												Guruh: {group.groupName}
 											</h4>
 
 											{group.students.length > 0 ? (
-												<table className="w-full text-left border border-gray-300">
-													<thead>
-														<tr className="bg-gray-200 text-gray-700">
-															<th className="px-4 py-2 border">Talaba ismi</th>
-														</tr>
-													</thead>
-													<tbody>
-														{group.students.map((student) => (
-															<tr key={student.studentId} className="hover:bg-gray-50">
-																<td className="px-4 py-2 border">{student.fullName}</td>
+												<div className="w-full overflow-x-auto">
+													<table className="table-auto w-auto border-collapse border text-sm">
+														<thead className="bg-gray-100">
+															<tr>
+																<th className="border px-2 py-1">№</th>
+																<th className="border px-2 py-1">Ism Familiya</th>
+																<th className="border px-2 py-1">Oyligi</th>
+																{days.map((day) => (
+																	<th key={day} className="border px-2 py-1 text-center">{day}</th>
+																))}
+																<th className="border px-2 py-1">Hisoblanma</th>
+																<th className="border px-2 py-1">To'lov qilingan</th>
 															</tr>
-														))}
-													</tbody>
-												</table>
+														</thead>
+														<tbody>
+															{group.students.map((student, idx) => (
+																<tr key={student.studentId}>
+																	<td className="border px-2 py-1 text-center">{idx + 1}</td>
+																	<td className="border px-2 py-1">{student.fullName}</td>
+																	<td className="border px-2 py-1">{student.fee || ""}</td>
+																	{days.map((day) => (
+																		<td key={day} className="border px-2 py-1"></td>
+																	))}
+																	<td className="border px-2 py-1"></td>
+																	<td className="border px-2 py-1">{student.paymentStatus || ""}</td>
+																</tr>
+															))}
+														</tbody>
+													</table>
+												</div>
 											) : (
-												<p className="text-sm text-gray-500 text-center italic">
-													Talabalar mavjud emas
-												</p>
+												<p className="text-sm text-gray-500">Talabalar yo‘q</p>
 											)}
 										</div>
 									))}

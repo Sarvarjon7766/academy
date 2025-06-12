@@ -16,7 +16,8 @@ const AdminDashboard = () => {
 
   return (
     <Layout role="admin">
-      <div className='p-4 flex-1 bg-gray-50 overflow-y-auto'>
+      <div className='p-4 flex-1 bg-gray-50 overflow-auto'>
+
       </div>
     </Layout>
   );

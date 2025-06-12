@@ -8,7 +8,7 @@ export default {
     extend: {
       screens:{
         'xs': '480px',
-        'mdx':'840',  // Yangi breakpoint qo‘shish
+        'mdx':'840px',  // Yangi breakpoint qo‘shish
         '3xl': '1920px', // Katta ekranlar uchun qo‘shimcha breakpoint
       },
     },

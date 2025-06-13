@@ -1,5 +1,5 @@
 import axios from 'axios'
-import React, { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { FaCircleUser } from 'react-icons/fa6'
 import { useNavigate } from 'react-router-dom'
 import logo from '../assets/logo.jpg'
@@ -77,7 +77,7 @@ const Navbar = ({ toggleSidebar }) => {
           className="p-3 rounded-md bg-blue-600 border-none text-white hover:bg-blue-700 flex items-center gap-3 transition-all duration-300"
         >
           <FaCircleUser className="w-7 h-7 text-white" />
-          <span className="hidden sm:block text-lg">{user.fullName}</span>
+          <span className="hidden sm:block text-sm">{user.fullName}</span>
         </button>
 
         {isProfileMenuOpen && (

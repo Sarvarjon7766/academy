@@ -1,27 +1,25 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
 import {
+  BookOpen,
+  Calendar,
+  CheckCircle,
+  ClipboardList,
+  CreditCard,
+  FileBarChart2,
+  FileText,
+  GraduationCap,
   Home,
+  Landmark,
+  ListChecks,
+  LogOut,
+  Megaphone,
+  MessageCircle,
+  RefreshCcw,
+  UserCircle,
   UserPlus,
   Users,
-  GraduationCap,
-  BookOpen,
-  Wallet,
-  MessageCircle,
-  Megaphone,
-  FileText,
-  LogOut,
-  UserCircle,
-  FileBarChart2,
-  Calendar,
-  CreditCard,
-  ClipboardList,
-  UserCheck,
-  Landmark,
-  RefreshCcw,
-  CheckCircle,
-  ListChecks
-} from 'lucide-react';
+  Wallet
+} from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 const Sidebar = ({ isOpen, toggleSidebar, role }) => {
   const iconMap = {
@@ -57,8 +55,9 @@ const Sidebar = ({ isOpen, toggleSidebar, role }) => {
     'Talaba holati': <CheckCircle className="w-5 h-5 mr-2" />,
     "Yotoqxona": <Landmark className="w-5 h-5 mr-2" />,
     'Chiqish': <LogOut className="w-5 h-5 mr-2" />,
-    'Yakshanba': <ListChecks className="w-5 h-5 mr-2" />
-  };
+    'Yakshanba': <ListChecks className="w-5 h-5 mr-2" />,
+    "O'qituvchilar Davomati": <ListChecks className="w-5 h-5 mr-2" />
+  }
   const menuItems = {
     admin: [
       { name: 'Asosiy', link: '/admin' },
@@ -68,7 +67,8 @@ const Sidebar = ({ isOpen, toggleSidebar, role }) => {
       { name: 'Ota-onalar', link: '/admin/parent' },
       { name: "O'quvchilar", link: '/admin/student' },
       { name: "O'qituvchilar", link: '/admin/teacher' },
-       { name: "Xodimlar", link: '/admin/employer' },
+      { name: "O'qituvchilar Davomati", link: '/admin/teacher-attandance' },
+      { name: "Xodimlar", link: '/admin/employer' },
       { name: 'Fanlar', link: '/admin/subject' },
       { name: 'Moliya', link: '/admin/finence' },
       { name: 'Xabarlar', link: '/admin/message' },
@@ -114,15 +114,14 @@ const Sidebar = ({ isOpen, toggleSidebar, role }) => {
       { name: "Yotoqxona", link: '/register/hostel' },
       { name: 'Chiqish', link: '/login' }
     ]
-  };
+  }
 
-  const currentMenu = menuItems[role] || [];
+  const currentMenu = menuItems[role] || []
 
   return (
     <div
-      className={`fixed inset-y-0 left-0 z-30 w-64 bg-indigo-700 shadow-lg transform ${
-        isOpen ? 'translate-x-0' : '-translate-x-full'
-      } transition-transform duration-300 ease-in-out md:relative md:translate-x-0`}
+      className={`fixed inset-y-0 left-0 z-30 w-78 bg-indigo-700 shadow-lg transform ${isOpen ? 'translate-x-0' : '-translate-x-full'
+        } transition-transform duration-300 ease-in-out md:relative md:translate-x-0`}
     >
       <div className="p-4 border-b flex justify-between items-center">
         <h1 className="text-3xl text-white font-bold">Dashboard</h1>
@@ -140,6 +139,7 @@ const Sidebar = ({ isOpen, toggleSidebar, role }) => {
           <Link
             key={index}
             to={item.link}
+            onClick={toggleSidebar}
             className="flex items-center px-4 py-2 rounded-lg text-white hover:bg-white hover:text-indigo-700 transition"
           >
             {iconMap[item.name]}
@@ -148,7 +148,7 @@ const Sidebar = ({ isOpen, toggleSidebar, role }) => {
         ))}
       </nav>
     </div>
-  );
-};
+  )
+}
 
-export default Sidebar;
+export default Sidebar

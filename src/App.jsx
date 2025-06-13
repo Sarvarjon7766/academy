@@ -4,6 +4,7 @@ import { AdminDashboard, AdminHome, Ads, Applications, Finence, HotelControl, Me
 import { Home } from './site/'
 
 import StudentList from './page/admin/StudentList.jsx'
+import TeacherAttandance from './page/admin/teacher/TeacherAttandance.jsx'
 import { EmployerList, EmployerRegister } from './page/admin/employer/index.js'
 import TeacherRegister from './page/admin/teacher/TeacherRegister.jsx'
 import { AttandanseSunday, RegisterDashboard, RegisterHome, RegisterHostel, RegisterMessage, RegisterPayment, RegisterProfile, RegisterRefund, StudentsRegister, StudentStatusManager, UpdateStudent } from './page/register/index.js'
@@ -32,6 +33,7 @@ const App = () => {
           <Route path="ads" element={<Ads />} />
           <Route path="application" element={<Applications />} />
           <Route path="hotel-control" element={<HotelControl />} />
+          <Route path="teacher-attandance" element={<TeacherAttandance />} />
         </Route>
         <Route path="/teacher" element={<TeacherDashboard />}>
           <Route index element={<TeacherHome />} />

@@ -19,7 +19,9 @@ const MonthlyReport = () => {
 			.get(`${import.meta.env.VITE_API_URL}/api/teacher/teacher-selery`, {
 				params: { year: selectedYear, month: selectedMonth },
 			})
-			.then((res) => setData(res.data.data))
+			.then((res) => {
+				setData(res.data.data)
+			})
 			.catch((err) => console.error("Xatolik:", err))
 	}, [selectedYear, selectedMonth])
 
@@ -28,63 +30,131 @@ const MonthlyReport = () => {
 		setShareOfSalary(teacher.share_of_salary)
 	}
 
-	const exportToExcel = (teacher) => {
-		const wb = utils.book_new()
-		teacher.subjects.forEach((subject) => {
-			const ws = {}
-			const merges = []
-			const cols = []
-			let colOffset = 0
-			let maxRowCount = 0
+	const calculateHisoblanma = (student, validDaysLength, shareValue) => {
+		const attendance = student.attendance
+		let hisoblanmaydiganDarslar = 0
 
-			subject.groups.forEach((group) => {
-				const groupDatesSet = new Set()
-				group.students.forEach((student) => {
-					student.attendance.forEach((att) => {
-						const d = new Date(att.date)
-						const day = String(d.getDate()).padStart(2, "0")
-						if (att.Status === "Kelgan" || att.Status === "Kelmagan") {
-							groupDatesSet.add(day)
-						}
-					})
-				})
-				const validDays = Array.from(groupDatesSet).sort((a, b) => Number(a) - Number(b))
-				const headers = ["\u2116", "Ism Familiya", "Oyligi", "Ulushi", ...validDays, "Darslar soni", "Hisoblanma", "To'lov"]
-				const startCol = colOffset
-				merges.push({ s: { r: 0, c: startCol }, e: { r: 0, c: startCol + headers.length - 1 } })
-				ws[utils.encode_cell({ r: 0, c: startCol })] = { v: `Guruh: ${group.groupName}`, s: { font: { bold: true } } }
-				headers.forEach((header, i) => {
-					ws[utils.encode_cell({ r: 1, c: startCol + i })] = { v: header }
-					cols[startCol + i] = { wch: header.length + 2 }
-				})
-				group.students.forEach((student, rowIdx) => {
-					const row = [
-						rowIdx + 1,
-						student.fullName,
-						student.price || "",
-						(student.price * shareOfSalary).toFixed(2),
-						...validDays.map((day) => {
-							const match = student.attendance.find((a) => new Date(a.date).getDate() === Number(day))
-							return match?.Status === "Kelgan" ? "+" : match?.Status === "Kelmagan" ? "-" : ""
-						}),
-						validDays.length,
-						"",
-						student.paymentStatus || "",
-					]
-					row.forEach((val, i) => {
-						ws[utils.encode_cell({ r: rowIdx + 2, c: startCol + i })] = { v: val }
-					})
-				})
-				colOffset += headers.length + 2
-				maxRowCount = Math.max(maxRowCount, group.students.length + 2)
-			})
-			ws["!merges"] = merges
-			ws["!ref"] = `A1:${utils.encode_cell({ r: maxRowCount, c: colOffset })}`
-			ws["!cols"] = cols
-			utils.book_append_sheet(wb, ws, subject.subjectName.slice(0, 31))
-		})
-		writeFileXLSX(wb, `${teacher.teacherName}.xlsx`)
+		const kelmaganCount = attendance.filter((a) => a.Status === "Kelmagan").length
+		if (kelmaganCount > 2) {
+			hisoblanmaydiganDarslar += kelmaganCount
+		}
+
+		const ustozCount = attendance.filter((a) => a.Status === "Ustoz").length
+		hisoblanmaydiganDarslar += ustozCount
+
+		const statusYoqlari = attendance.filter((a) => !a.Status).length
+		hisoblanmaydiganDarslar += statusYoqlari
+
+		if (hisoblanmaydiganDarslar === 0 || validDaysLength === 0) return "0.00"
+
+		const deduction = student.price * shareValue - ((student.price * shareValue) / validDaysLength) * hisoblanmaydiganDarslar
+		return deduction.toFixed(2)
 	}
+
+	const exportToExcel = (teacher) => {
+	const wb = utils.book_new()
+	teacher.subjects.forEach((subject) => {
+		const ws = {}
+		const merges = []
+		const cols = []
+		let colOffset = 0
+		let maxRowCount = 0
+
+		subject.groups.forEach((group) => {
+			const groupDatesSet = new Set()
+			group.students.forEach((student) => {
+				student.attendance.forEach((att) => {
+					const d = new Date(att.date)
+					const day = String(d.getDate()).padStart(2, "0")
+					if (["Kelgan", "Kelmagan", "Ustoz"].includes(att.Status)) {
+						groupDatesSet.add(day)
+					}
+				})
+			})
+
+			const validDays = Array.from(groupDatesSet).sort((a, b) => Number(a) - Number(b))
+			const headers = ["№", "Ism Familiya", "Oyligi", "Ulushi", ...validDays, "Darslar soni", "Hisoblanma", "To'lov"]
+			const startCol = colOffset
+			merges.push({ s: { r: 0, c: startCol }, e: { r: 0, c: startCol + headers.length - 1 } })
+			ws[utils.encode_cell({ r: 0, c: startCol })] = { v: `Guruh: ${group.groupName}`, s: { font: { bold: true } } }
+
+			headers.forEach((header, i) => {
+				ws[utils.encode_cell({ r: 1, c: startCol + i })] = { v: header }
+				cols[startCol + i] = { wch: header.length + 2 }
+			})
+
+			// Jami oylik, ulush, hisoblanma, tolov
+			let totalSalary = 0
+			let totalShare = 0
+			let totalHisoblanma = 0
+			let totalTulov = 0
+
+			group.students.forEach((student, rowIdx) => {
+				const hisoblanma = parseFloat(calculateHisoblanma(student, validDays.length, shareOfSalary))
+				const tulov = parseFloat((student.price * shareOfSalary) - hisoblanma).toFixed(2)
+
+				const ulush = parseFloat((student.price * shareOfSalary).toFixed(2))
+				totalSalary += parseFloat(student.price || 0)
+				totalShare += ulush
+				totalHisoblanma += hisoblanma
+				totalTulov += parseFloat(tulov)
+
+				const row = [
+					rowIdx + 1,
+					student.fullName,
+					Number(student.price) || "",
+					ulush,
+					...validDays.map((day) => {
+						const match = student.attendance.find((a) => new Date(a.date).getDate() === Number(day))
+						return match?.Status === "Kelgan" ? "+" : match?.Status === "Kelmagan" ? "-" : match?.Status === "Ustoz" ? "k" : ""
+					}),
+					validDays.length,
+					hisoblanma.toFixed(2),
+					tulov
+				]
+
+				row.forEach((val, i) => {
+					ws[utils.encode_cell({ r: rowIdx + 2, c: startCol + i })] = { v: val }
+				})
+			})
+
+			// Oxirgi qator: jami qiymatlar
+			const totalRowIndex = group.students.length + 2
+
+			const salaryCol = startCol + 2
+			const shareCol = startCol + 3
+			const hisobCol = startCol + headers.length - 2
+			const tulovCol = startCol + headers.length - 1
+
+			ws[utils.encode_cell({ r: totalRowIndex, c: salaryCol })] = {
+				v: totalSalary.toFixed(2),
+				s: { font: { bold: true } }
+			}
+			ws[utils.encode_cell({ r: totalRowIndex, c: shareCol })] = {
+				v: totalShare.toFixed(2),
+				s: { font: { bold: true } }
+			}
+			ws[utils.encode_cell({ r: totalRowIndex, c: hisobCol })] = {
+				v: totalHisoblanma.toFixed(2),
+				s: { font: { bold: true } }
+			}
+			ws[utils.encode_cell({ r: totalRowIndex, c: tulovCol })] = {
+				v: totalTulov.toFixed(2),
+				s: { font: { bold: true } }
+			}
+
+			colOffset += headers.length + 2
+			maxRowCount = Math.max(maxRowCount, group.students.length + 3)
+		})
+
+		ws["!merges"] = merges
+		ws["!ref"] = `A1:${utils.encode_cell({ r: maxRowCount, c: colOffset })}`
+		ws["!cols"] = cols
+		utils.book_append_sheet(wb, ws, subject.subjectName.slice(0, 31))
+	})
+	writeFileXLSX(wb, `${teacher.teacherName}.xlsx`)
+}
+
 
 	return (
 		<div className="p-4 space-y-6">
@@ -110,12 +180,14 @@ const MonthlyReport = () => {
 						<div key={subject.subjectId} className="mt-4">
 							<h3 className="text-md font-semibold mb-2">{subject.subjectName}</h3>
 							{subject.groups.map((group) => {
+								let totalHisoblanma = 0
+								let totalTulov = 0
 								const groupDatesSet = new Set()
 								group.students.forEach((student) => {
 									student.attendance.forEach((att) => {
 										const d = new Date(att.date)
 										const day = String(d.getDate()).padStart(2, "0")
-										if (att.Status === "Kelgan" || att.Status === "Kelmagan") {
+										if (["Kelgan", "Kelmagan", "Ustoz"].includes(att.Status)) {
 											groupDatesSet.add(day)
 										}
 									})
@@ -147,8 +219,12 @@ const MonthlyReport = () => {
 																const d = new Date(a.date)
 																return String(d.getDate()).padStart(2, "0") === day
 															})
-															return match?.Status === "Kelgan" ? "+" : match?.Status === "Kelmagan" ? "-" : ""
+															return match?.Status === "Kelgan" ? "+" : match?.Status === "Kelmagan" ? "-" : match?.Status === "Ustoz" ? "k" : ""
 														})
+														const hisoblanma = calculateHisoblanma(student, validDays.length, shareOfSalary)
+														const tulov = ((student.price * shareOfSalary) - hisoblanma).toFixed(2)
+														totalHisoblanma += parseFloat(hisoblanma || 0)
+														totalTulov += parseFloat(tulov || 0)
 														return (
 															<tr key={student.studentId}>
 																<td className="border px-2 py-1 text-center">{idx + 1}</td>
@@ -158,14 +234,23 @@ const MonthlyReport = () => {
 																{attendanceMarks.map((mark, i) => (
 																	<td key={i} className="border px-2 py-1 text-center">{mark}</td>
 																))}
-																<td className="border px-2 py-1 text-center">{attendanceMarks.length}</td>
-																<td className="border px-2 py-1 text-center"></td>
-																<td className="border px-2 py-1 text-center">{student.paymentStatus || ""}</td>
+																<td className="border px-2 py-1 text-center">{validDays.length}</td>
+																<td className="border px-2 py-1 text-center">{(hisoblanma).toLocaleString('ru-RU').replace(/,/g, ' ')}</td>
+																<td className="border px-2 py-1 text-center">{tulov}</td>
 															</tr>
 														)
 													})}
 												</tbody>
 											</table>
+											<div className="flex flex-col sm:flex-row justify-end gap-4 mt-3 pr-2">
+												<p className="text-right text-gray-700 font-semibold text-base bg-gray-100 px-4 py-2 rounded shadow">
+													{totalHisoblanma.toLocaleString('ru-RU').replace(/,/g, ' ')} so‘m
+												</p>
+												<p className="text-right text-gray-700 font-semibold text-base bg-gray-100 px-4 py-2 rounded shadow">
+													{totalTulov.toLocaleString('ru-RU').replace(/,/g, ' ')} so‘m
+												</p>
+											</div>
+
 										</div>
 									</div>
 								)

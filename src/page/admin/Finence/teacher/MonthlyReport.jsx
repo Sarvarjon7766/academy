@@ -35,7 +35,7 @@ const MonthlyReport = () => {
 				params: { year: selectedYear, month: selectedMonth },
 			})
 			.then((res) => {
-				setData(res.data.data);
+				setData(res.data.data)
 				console.log(res.data.data)
 			})
 			.catch((err) => console.error("Xatolik:", err))
@@ -47,25 +47,29 @@ const MonthlyReport = () => {
 	}
 
 	const calculateHisoblanma = (student, validDaysLength, shareValue) => {
-		const attendance = student.attendance
-		let hisoblanmaydiganDarslar = 0
+		const attendance = student.attendance || []
 
-		const kelmaganCount = attendance.filter((a) => a.Status === "Kelmagan").length
-		if (kelmaganCount > 2) {
-			hisoblanmaydiganDarslar += kelmaganCount
-		}
+		// Statuslar bo‘yicha ajratish
+		const kelganCount = attendance.filter(a => a.Status === "Kelgan").length
+		const kelmaganCount = attendance.filter(a => a.Status === "Kelmagan").length
+		const ustozCount = attendance.filter(a => a.Status === "Ustoz").length
+		const ishtirokEtmaganCount = attendance.filter(a => a.Status === "Ishtirok etmagan").length
 
-		const ustozCount = attendance.filter((a) => a.Status === "Ustoz").length
-		hisoblanmaydiganDarslar += ustozCount
+		// "Kelmagan" 2tasi kechiriladi
+		const kelmaganKechirilgan = Math.min(2, kelmaganCount)
 
-		const statusYoqlari = attendance.filter((a) => !a.Status).length
-		hisoblanmaydiganDarslar += statusYoqlari
+		// Haqiqiy hisobga olinadigan darslar soni
+		const tolanadiganDarslar = kelganCount + kelmaganKechirilgan
 
-		if (hisoblanmaydiganDarslar === 0 || validDaysLength === 0) return "0.00"
+		const fullUlush = student.price * shareValue
 
-		const deduction = student.price * shareValue - ((student.price * shareValue) / validDaysLength) * hisoblanmaydiganDarslar
-		return deduction.toFixed(2)
+		if (validDaysLength === 0 || tolanadiganDarslar === 0) return 0
+
+		const hisoblanma = (fullUlush / validDaysLength) * tolanadiganDarslar
+
+		return parseFloat(hisoblanma.toFixed(2))
 	}
+
 
 	const exportToExcel = (teacher) => {
 		const wb = utils.book_new()
@@ -121,7 +125,7 @@ const MonthlyReport = () => {
 						ulush,
 						...validDays.map(day => {
 							const match = student.attendance.find(a => new Date(a.date).getDate() === Number(day))
-							return match?.Status === "Kelgan" ? "+" : match?.Status === "Kelmagan" ? "-" : match?.Status === "Ustoz" ? "k" : match?.Status === "Ishtirok etmagan" ? "y":""
+							return match?.Status === "Kelgan" ? "+" : match?.Status === "Kelmagan" ? "-" : match?.Status === "Ustoz" ? "k" : match?.Status === "Ishtirok etmagan" ? "y" : ""
 						}),
 						validDays.length,
 						hisoblanma.toFixed(2),
@@ -171,7 +175,7 @@ const MonthlyReport = () => {
 				<p className="text-red-600 text-center font-semibold">
 					Hozirgi oy yoki kelajak oy uchun ma’lumot mavjud emas.
 				</p>
-			):data.map((teacher) => (
+			) : data.map((teacher) => (
 				<div key={teacher.teacherId} className="border rounded bg-white shadow p-4">
 					<div className="flex justify-between items-center cursor-pointer" onClick={() => toggleTeacher(teacher)}>
 						<h2 className="font-bold text-lg">{teacher.teacherName}</h2>
@@ -224,7 +228,7 @@ const MonthlyReport = () => {
 																const d = new Date(a.date)
 																return String(d.getDate()).padStart(2, "0") === day
 															})
-															return match?.Status === "Kelgan" ? "+" : match?.Status === "Kelmagan" ? "-" : match?.Status === "Ustoz" ? "k" : match?.Status === "Ishtirok etmagan" ? "y":""
+															return match?.Status === "Kelgan" ? "+" : match?.Status === "Kelmagan" ? "-" : match?.Status === "Ustoz" ? "k" : match?.Status === "Ishtirok etmagan" ? "y" : ""
 														})
 														const hisoblanma = calculateHisoblanma(student, validDays.length, shareOfSalary)
 														const tulov = ((student.price * shareOfSalary) - hisoblanma).toFixed(2)

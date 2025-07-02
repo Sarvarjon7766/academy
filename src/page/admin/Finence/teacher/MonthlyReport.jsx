@@ -3,7 +3,6 @@ import { useEffect, useState } from "react"
 import { FaDownload } from "react-icons/fa6"
 import { utils, writeFileXLSX } from "xlsx"
 
-
 const monthNames = [
 	"Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun",
 	"Iyul", "Avgust", "Sentabr", "Oktabr", "Noyabr", "Dekabr"
@@ -12,21 +11,32 @@ const monthNames = [
 const MonthlyReport = () => {
 	const now = new Date()
 	const currentYear = now.getFullYear()
+	const month = now.getMonth()
 	const currentMonth = now.getMonth() + 1
 
 	const [data, setData] = useState([])
 	const [activeTeacher, setActiveTeacher] = useState(null)
 	const [shareOfSalary, setShareOfSalary] = useState(0)
 	const [selectedYear, setSelectedYear] = useState(currentYear)
-	const [selectedMonth, setSelectedMonth] = useState(currentMonth)
+	const [selectedMonth, setSelectedMonth] = useState(month)
 
 	useEffect(() => {
+		const isFutureMonth =
+			selectedYear > currentYear ||
+			(selectedYear === currentYear && selectedMonth >= currentMonth)
+
+		if (isFutureMonth) {
+			setData([])
+			return
+		}
+
 		axios
 			.get(`${import.meta.env.VITE_API_URL}/api/teacher/teacher-selery`, {
 				params: { year: selectedYear, month: selectedMonth },
 			})
 			.then((res) => {
-				setData(res.data.data)
+				setData(res.data.data);
+				console.log(res.data.data)
 			})
 			.catch((err) => console.error("Xatolik:", err))
 	}, [selectedYear, selectedMonth])
@@ -111,7 +121,7 @@ const MonthlyReport = () => {
 						ulush,
 						...validDays.map(day => {
 							const match = student.attendance.find(a => new Date(a.date).getDate() === Number(day))
-							return match?.Status === "Kelgan" ? "+" : match?.Status === "Kelmagan" ? "-" : match?.Status === "Ustoz" ? "k" : ""
+							return match?.Status === "Kelgan" ? "+" : match?.Status === "Kelmagan" ? "-" : match?.Status === "Ustoz" ? "k" : match?.Status === "Ishtirok etmagan" ? "y":""
 						}),
 						validDays.length,
 						hisoblanma.toFixed(2),
@@ -142,6 +152,7 @@ const MonthlyReport = () => {
 	}
 
 
+
 	return (
 		<div className="p-4 space-y-6">
 			<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
@@ -156,7 +167,11 @@ const MonthlyReport = () => {
 					))}
 				</select>
 			</div>
-			{data.map((teacher) => (
+			{(selectedYear > currentYear || (selectedYear === currentYear && selectedMonth >= currentMonth)) ? (
+				<p className="text-red-600 text-center font-semibold">
+					Hozirgi oy yoki kelajak oy uchun ma’lumot mavjud emas.
+				</p>
+			):data.map((teacher) => (
 				<div key={teacher.teacherId} className="border rounded bg-white shadow p-4">
 					<div className="flex justify-between items-center cursor-pointer" onClick={() => toggleTeacher(teacher)}>
 						<h2 className="font-bold text-lg">{teacher.teacherName}</h2>
@@ -199,7 +214,7 @@ const MonthlyReport = () => {
 														))}
 														<th className="border px-2 py-1">Darslar soni</th>
 														<th className="border px-2 py-1">Hisoblanma</th>
-														<th className="border px-2 py-1">To'lov</th>
+														<th className="border px-2 py-1">Ushlanma</th>
 													</tr>
 												</thead>
 												<tbody>
@@ -209,7 +224,7 @@ const MonthlyReport = () => {
 																const d = new Date(a.date)
 																return String(d.getDate()).padStart(2, "0") === day
 															})
-															return match?.Status === "Kelgan" ? "+" : match?.Status === "Kelmagan" ? "-" : match?.Status === "Ustoz" ? "k" : ""
+															return match?.Status === "Kelgan" ? "+" : match?.Status === "Kelmagan" ? "-" : match?.Status === "Ustoz" ? "k" : match?.Status === "Ishtirok etmagan" ? "y":""
 														})
 														const hisoblanma = calculateHisoblanma(student, validDays.length, shareOfSalary)
 														const tulov = ((student.price * shareOfSalary) - hisoblanma).toFixed(2)

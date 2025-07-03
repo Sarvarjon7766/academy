@@ -38,7 +38,6 @@ const TeachersManage = () => {
     fetchTeacher()
   }, [])
 
-
   const handleSearch = (e) => {
     const value = e.target.value.toLowerCase()
     setSearchTerm(value)
@@ -66,16 +65,18 @@ const TeachersManage = () => {
     navigate('/admin/teacher-register', {
       state: {
         teacher: selectedTeacher,
-        section: selectedOption, // 0, 1, 2 qiymatlar
+        section: selectedOption,
       },
     })
   }
 
+  const getLatestSalary = (teacher) => {
+    return  teacher.salaryHistory?.[teacher.salaryHistory.length - 1] || {salary:teacher.salary,share_of_salary:teacher.share_of_salary}
+  }
 
-  // PDF eksport funksiyasi
   const exportToPDF = () => {
     if (!selectedTeacher) return
-
+    const latest = getLatestSalary(selectedTeacher)
     const pdf = new jsPDF()
 
     pdf.setFontSize(18)
@@ -92,39 +93,38 @@ const TeachersManage = () => {
       `Jins: ${selectedTeacher.gender}`,
       `Malaka: ${selectedTeacher.qualification}`,
       `Fanlar: ${selectedTeacher.subjects ? selectedTeacher.subjects.map(s => s.subjectName).join(', ') : selectedTeacher.subjectNames}`,
-      `Oylik maosh: ${selectedTeacher.salary.toLocaleString()} UZS`,
-      `Ulushi: ${selectedTeacher.share_of_salary}%`,
+      `Oylik maosh: ${latest.salary?.toLocaleString() || 'Nomaʼlum'} UZS`,
+      `Ulushi: ${latest.share_of_salary ?? 'Nomaʼlum'}%`,
     ]
 
     let y = 30
     lines.forEach(line => {
       pdf.text(line, 10, y)
-      y += 10 // qatorlar orasini 10 mm qilib qo‘ydik
+      y += 10
     })
 
     pdf.save(`${selectedTeacher.fullName}.pdf`)
   }
 
-
-  // Excel eksport funksiyasi
   const exportToExcel = () => {
+    const latest = getLatestSalary(selectedTeacher)
     const worksheet = XLSX.utils.json_to_sheet([
       { Key: 'Telefon', Value: selectedTeacher.phone },
       { Key: 'Manzil', Value: selectedTeacher.address || '-' },
-      { Key: 'Tug\'ilgan sana', Value: new Date(selectedTeacher.date_of_birth).toLocaleDateString() },
+      { Key: 'Tugilgan sana', Value: new Date(selectedTeacher.date_of_birth).toLocaleDateString() },
       { Key: 'Jins', Value: selectedTeacher.gender },
       { Key: 'Malaka', Value: selectedTeacher.qualification },
       { Key: 'Fanlar', Value: selectedTeacher.subjects ? selectedTeacher.subjects.map(s => s.subjectName).join(', ') : selectedTeacher.subjectNames },
-      { Key: 'Oylik maosh', Value: selectedTeacher.salary.toLocaleString() + ' UZS' },
-      { Key: 'Ulushi', Value: selectedTeacher.share_of_salary + '%' },
+      { Key: 'Oylik maosh', Value: latest.salary?.toLocaleString() + ' UZS' || 'Nomaʼlum' },
+      { Key: 'Ulushi', Value: latest.share_of_salary != null ? latest.share_of_salary + '%' : 'Nomaʼlum' },
     ])
     const workbook = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Teacher Info')
     XLSX.writeFile(workbook, `${selectedTeacher.fullName}.xlsx`)
   }
 
-  // Word eksport funksiyasi
   const exportToDocx = () => {
+    const latest = getLatestSalary(selectedTeacher)
     const doc = new Document({
       sections: [{
         children: [
@@ -135,8 +135,8 @@ const TeachersManage = () => {
           new Paragraph({ text: `Jins: ${selectedTeacher.gender}` }),
           new Paragraph({ text: `Malaka: ${selectedTeacher.qualification}` }),
           new Paragraph({ text: `Fanlar: ${selectedTeacher.subjects ? selectedTeacher.subjects.map(s => s.subjectName).join(', ') : selectedTeacher.subjectNames}` }),
-          new Paragraph({ text: `Oylik maosh: ${selectedTeacher.salary.toLocaleString()} UZS` }),
-          new Paragraph({ text: `Ulushi: ${selectedTeacher.share_of_salary}%` }),
+          new Paragraph({ text: `Oylik maosh: ${latest.salary?.toLocaleString() || 'Nomaʼlum'} UZS` }),
+          new Paragraph({ text: `Ulushi: ${latest.share_of_salary ?? 'Nomaʼlum'}%` }),
         ]
       }]
     })
@@ -189,19 +189,16 @@ const TeachersManage = () => {
       </div>
       {modalOpen && selectedTeacher && (
         <>
-          {/* Overlay */}
           <div
             className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40"
             onClick={closeModal}
           ></div>
 
-          {/* Modal Content */}
           <div
             className="fixed inset-0 flex items-center justify-center z-50 px-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="relative bg-white rounded-3xl w-full max-w-3xl p-6 shadow-2xl ring-4 ring-purple-400 max-h-[90vh] overflow-y-auto">
-              {/* Close Button */}
               <button
                 className="absolute bg-white top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full text-purple-700 hover:text-purple-900 hover:bg-purple-100 transition text-2xl font-bold"
                 onClick={closeModal}
@@ -210,12 +207,10 @@ const TeachersManage = () => {
                 &times;
               </button>
 
-              {/* Title */}
               <h3 className="text-2xl sm:text-3xl font-extrabold text-purple-900 mb-6 border-b border-purple-300 pb-3 text-center">
                 {selectedTeacher.fullName}
               </h3>
 
-              {/* Info Section */}
               <div className="space-y-3 text-gray-800 text-sm sm:text-base leading-relaxed">
                 <p><span className="font-semibold text-purple-700">Telefon:</span> {selectedTeacher.phone}</p>
                 <p><span className="font-semibold text-purple-700">Manzil:</span> {selectedTeacher.address || '-'}</p>
@@ -223,13 +218,11 @@ const TeachersManage = () => {
                 <p><span className="font-semibold text-purple-700">Jins:</span> {selectedTeacher.gender}</p>
                 <p><span className="font-semibold text-purple-700">Malaka:</span> {selectedTeacher.qualification}</p>
                 <p><span className="font-semibold text-purple-700">Fanlar:</span> {selectedTeacher.subjects ? selectedTeacher.subjects.map(s => s.subjectName).join(', ') : selectedTeacher.subjectNames}</p>
-                <p><span className="font-semibold text-purple-700">Oylik maosh:</span> {selectedTeacher.salary.toLocaleString()} UZS</p>
-                <p><span className="font-semibold text-purple-700">Ulushi:</span> {selectedTeacher.share_of_salary}%</p>
+                <p><span className="font-semibold text-purple-700">Oylik maosh:</span> {getLatestSalary(selectedTeacher).salary?.toLocaleString() || 'Nomaʼlum'} UZS</p>
+                <p><span className="font-semibold text-purple-700">Ulushi:</span> {getLatestSalary(selectedTeacher).share_of_salary ?? 'Nomaʼlum'}%</p>
               </div>
 
-              {/* Action Buttons */}
               <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {/* Select dropdown */}
                 <select
                   className="border border-purple-400 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm sm:text-base"
                   value={selectedOption}
@@ -241,7 +234,6 @@ const TeachersManage = () => {
                   <option value="2">Oylik</option>
                 </select>
 
-                {/* Buttons */}
                 <button
                   onClick={updateHandler}
                   className="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-md w-full shadow-sm transition duration-200 text-sm sm:text-base"

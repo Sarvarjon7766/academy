@@ -1,32 +1,34 @@
 import axios from 'axios'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
 const AvansReport = () => {
+	const now = new Date()
 	const [teachers, setTeachers] = useState([])
+	const [avansList, setAvansList] = useState([])
 	const [selectedTeacher, setSelectedTeacher] = useState(null)
 	const [maxAvans, setMaxAvans] = useState(null)
-	const [avansList, setAvansList] = useState([])
+	const [avansRemaining, setAvansRemaining] = useState(0)
+	const [loading, setLoading] = useState(true)
 	const [formData, setFormData] = useState({
 		teacherId: '',
 		teacherName: '',
 		amount: '',
 		note: ''
 	})
-	const [loading, setLoading] = useState(true)
-	const [avansRemaining, setAvansRemaining] = useState(0)
 
-	const now = new Date()
 	const [selectedYear, setSelectedYear] = useState(now.getFullYear())
 	const [selectedMonth, setSelectedMonth] = useState(now.getMonth()) // 0-based
+
+	const isCurrentMonth = selectedMonth === now.getMonth() && selectedYear === now.getFullYear()
 
 	const years = Array.from({ length: 5 }, (_, i) => now.getFullYear() - 2 + i)
 	const months = ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'Iyun', 'Iyul', 'Avgust', 'Sentabr', 'Oktabr', 'Noyabr', 'Dekabr']
 
-	// Ma'lumotlarni olish
+	// Dastlabki yuklash
 	useEffect(() => {
-		const fetchInitialData = async () => {
+		const fetchData = async () => {
 			try {
 				const [teacherRes, avansRes] = await Promise.all([
 					axios.get(`${import.meta.env.VITE_API_URL}/api/teacher/getAll`),
@@ -34,20 +36,28 @@ const AvansReport = () => {
 				])
 				if (teacherRes.data.success) setTeachers(teacherRes.data.teachers)
 				if (avansRes.data.success) setAvansList(avansRes.data.avanses)
-			} catch (error) {
-				console.error('Yuklashda xatolik:', error)
+			} catch (err) {
+				console.error('Yuklashda xatolik:', err)
 			} finally {
 				setLoading(false)
 			}
 		}
-		fetchInitialData()
+		fetchData()
 	}, [])
 
-	// Avans limiti
+	// Filterlangan avanslar
+	const filteredAvansList = useMemo(() => {
+		return avansList.filter(avans => {
+			const d = new Date(avans.date)
+			return d.getFullYear() === selectedYear && d.getMonth() === selectedMonth
+		})
+	}, [avansList, selectedMonth, selectedYear])
+
+	// Limitni yangilash
 	useEffect(() => {
 		if (!selectedTeacher) return
 
-		const fetchTeacherMonthlySalary = async () => {
+		const fetchLimit = async () => {
 			try {
 				const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/teacher/teachermonth-selery`, {
 					params: {
@@ -59,32 +69,24 @@ const AvansReport = () => {
 				if (res.data.success) {
 					const max = res.data.data.maxAvans || 1500000
 					setMaxAvans(max)
-
-					// Shu oydagi avanslar
-					const totalAvans = avansList
+					const total = filteredAvansList
 						.filter(a => a.teacherId === selectedTeacher)
-						.filter(a => {
-							const d = new Date(a.date)
-							return d.getFullYear() === selectedYear && d.getMonth() === selectedMonth
-						})
 						.reduce((sum, a) => sum + a.amount, 0)
-
-					setAvansRemaining(max - totalAvans)
+					setAvansRemaining(max - total)
 				}
-			} catch (error) {
-				console.error('Oylikni olishda xatolik:', error)
+			} catch (err) {
+				console.error('Limitni olishda xatolik:', err)
 			}
 		}
-		fetchTeacherMonthlySalary()
-	}, [selectedTeacher, selectedYear, selectedMonth, avansList])
+		fetchLimit()
+	}, [selectedTeacher, selectedMonth, selectedYear, filteredAvansList])
 
-	// Form controllari
-	const handleChange = (e) => {
+	const handleChange = e => {
 		const { name, value } = e.target
 		setFormData(prev => ({ ...prev, [name]: value }))
 	}
 
-	const handleAddAvans = async (e) => {
+	const handleAddAvans = async e => {
 		e.preventDefault()
 		const { teacherId, amount } = formData
 		const selectedT = teachers.find(t => t._id === teacherId)
@@ -111,21 +113,17 @@ const AvansReport = () => {
 		}
 	}
 
-	// Filterlash
-	const filteredAvansList = avansList.filter(avans => {
-		const d = new Date(avans.date)
-		return d.getFullYear() === selectedYear && d.getMonth() === selectedMonth
-	})
-
-	const groupedAvans = filteredAvansList.reduce((acc, curr) => {
-		if (!curr.teacherName) return acc
-		if (!acc[curr.teacherName]) acc[curr.teacherName] = []
-		acc[curr.teacherName].push(curr)
-		return acc
-	}, {})
+	const groupedAvans = useMemo(() => {
+		return filteredAvansList.reduce((acc, curr) => {
+			if (!curr.teacherName) return acc
+			if (!acc[curr.teacherName]) acc[curr.teacherName] = []
+			acc[curr.teacherName].push(curr)
+			return acc
+		}, {})
+	}, [filteredAvansList])
 
 	return (
-		<div className="p-4 max-w-7xl mx-auto">
+		<div className="p-4 max-w-6xl mx-auto">
 			<ToastContainer position="top-right" autoClose={3000} />
 
 			{/* Filter */}
@@ -139,7 +137,6 @@ const AvansReport = () => {
 						<option key={idx} value={idx}>{m}</option>
 					))}
 				</select>
-
 				<select
 					className="border px-4 py-2 rounded shadow"
 					value={selectedYear}
@@ -171,11 +168,13 @@ const AvansReport = () => {
 					name="amount"
 					value={formData.amount}
 					onChange={handleChange}
-					disabled={avansRemaining <= 0}
+					disabled={!isCurrentMonth || avansRemaining <= 0}
 					placeholder={
-						avansRemaining <= 0
-							? "🚫 Limitga yetilgan"
-							: `💡 Sizning limitingiz: ${avansRemaining?.toLocaleString('ru-RU')} so‘m`
+						!isCurrentMonth
+							? "🚫 Avans faqat joriy oyda"
+							: avansRemaining <= 0
+								? "🚫 Limitga yetilgan"
+								: `💡 Limit: ${avansRemaining?.toLocaleString('ru-RU')} so‘m`
 					}
 					className="border px-3 py-2 rounded shadow"
 				/>
@@ -185,14 +184,15 @@ const AvansReport = () => {
 					name="note"
 					value={formData.note}
 					onChange={handleChange}
+					disabled={!isCurrentMonth}
 					placeholder="📝 Izoh (ixtiyoriy)"
 					className="border px-3 py-2 rounded shadow"
 				/>
 
 				<button
 					type="submit"
-					disabled={avansRemaining <= 0}
-					className={`sm:col-span-3 text-white py-2 rounded shadow transition-all ${avansRemaining <= 0
+					disabled={!isCurrentMonth || avansRemaining <= 0}
+					className={`sm:col-span-3 text-white py-2 rounded shadow transition-all ${(!isCurrentMonth || avansRemaining <= 0)
 						? 'bg-gray-400 cursor-not-allowed opacity-50'
 						: 'bg-blue-600 hover:bg-blue-700'
 						}`}
@@ -204,7 +204,7 @@ const AvansReport = () => {
 			{/* Jadval */}
 			{loading ? (
 				<p className="text-center text-gray-500">⏳ Yuklanmoqda...</p>
-			) : Object.entries(groupedAvans).length === 0 ? (
+			) : Object.keys(groupedAvans).length === 0 ? (
 				<p className="text-center text-gray-500">📭 Avanslar mavjud emas</p>
 			) : (
 				Object.entries(groupedAvans).map(([teacher, list]) => {
@@ -213,11 +213,10 @@ const AvansReport = () => {
 						<div key={teacher} className="mb-6 border rounded-lg p-4 bg-white shadow">
 							<h3 className="text-lg font-semibold mb-2 text-blue-700 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
 								<span className="break-words">{teacher}</span>
-								<span className="text-xs sm:text-sm bg-green-100 text-green-800 px-3 py-1 rounded-full shadow border border-green-300 inline-block whitespace-nowrap">
+								<span className="text-xs sm:text-sm bg-green-100 text-green-800 px-3 py-1 rounded-full border border-green-300 inline-block whitespace-nowrap">
 									💰 {total.toLocaleString('ru-RU')} so‘m
 								</span>
 							</h3>
-
 
 							<div className="overflow-x-auto">
 								<table className="min-w-full text-sm border text-center">

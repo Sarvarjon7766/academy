@@ -34,14 +34,6 @@ const TeacherFinence = () => {
           <FaMoneyBillWave />
           Avans hisobotlari
         </button>
-
-        <button
-          onClick={() => setActiveTab('debt')}
-          className={`flex items-center gap-2 px-4 py-2 rounded ${activeTab === 'debt' ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-        >
-          <FaExclamationTriangle />
-          Qarzdorlar
-        </button>
       </div>
 			{activeTab === 'general' && (
         <div className="mt-6 p-2 m-2">

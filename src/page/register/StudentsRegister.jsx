@@ -108,7 +108,7 @@ const StudentsRegister = () => {
     setIsAvailable(0);
     setIsHotel(true);
     setFormData(defaultForm);
-    navigate('/');
+    navigate('/register');
   };
 
   const inputs = [

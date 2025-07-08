@@ -204,12 +204,7 @@ const OtherCosts = ({ studentId, onclick, onHotelChange }) => {
 
       {/* Tugmalar */}
       <div className="flex flex-col sm:flex-row justify-between gap-4 mt-6">
-        <button
-          onClick={() => window.history.back()}
-          className="px-6 py-3 bg-white text-gray-700 border border-gray-300 rounded-xl hover:bg-gray-50 flex items-center justify-center"
-        >
-          <FaArrowLeft className="mr-2" /> Orqaga
-        </button>
+       
 
         <div className="flex flex-col sm:flex-row gap-3">
           <button

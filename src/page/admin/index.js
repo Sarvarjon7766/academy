@@ -10,4 +10,5 @@ export { default as Message } from './Message'
 export { default as Ads } from './Ads'
 export { default as Applications } from './Applications'
 export { default as HotelControl } from './HotelControl'
+export { default as StudentsRegisterAdmin } from './StudentsRegisterAdmin'
 

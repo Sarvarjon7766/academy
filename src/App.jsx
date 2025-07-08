@@ -1,6 +1,6 @@
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom'
 import LoginPage from './page/Login'
-import { AdminDashboard, AdminHome, Ads, Applications, Finence, HotelControl, Message, ParentsManage, Registration, Subject, TeachersManage } from './page/admin/index.js'
+import { AdminDashboard, AdminHome, Ads, Applications, Finence, HotelControl, Message, ParentsManage, Registration, Subject, TeachersManage,StudentsRegisterAdmin } from './page/admin/index.js'
 import { Home } from './site/'
 
 import StudentList from './page/admin/StudentList.jsx'
@@ -22,7 +22,7 @@ const App = () => {
           <Route path="registration" element={<Registration />} />
           <Route path="parent" element={<ParentsManage />} />
           <Route path="student" element={<StudentList />} />
-          <Route path="student-register" element={<StudentsRegister />} />
+          <Route path="student-register" element={<StudentsRegisterAdmin />} />
           <Route path="student-update" element={<UpdateStudent />} />
           <Route path="teacher" element={<TeachersManage />} />
           <Route path="teacher-register" element={<TeacherRegister />} />

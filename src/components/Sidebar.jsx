@@ -27,7 +27,6 @@ const Sidebar = ({ isOpen, toggleSidebar, role }) => {
     'Registratsiya': <UserPlus className="w-5 h-5 mr-2" />,
     'Registratsiya student': <UserPlus className="w-5 h-5 mr-2" />,
     "Registratsiya o'qituvchi": <UserPlus className="w-5 h-5 mr-2" />,
-    'Ota-onalar': <Users className="w-5 h-5 mr-2" />,
     "O'quvchilar": <GraduationCap className="w-5 h-5 mr-2" />,
     "O'qituvchilar": <UserCircle className="w-5 h-5 mr-2" />,
     "Xodimlar": <UserCircle className="w-5 h-5 mr-2" />,
@@ -64,17 +63,18 @@ const Sidebar = ({ isOpen, toggleSidebar, role }) => {
       { name: 'Registratsiya student', link: '/admin/student-register' },
       { name: "Registratsiya o'qituvchi", link: '/admin/teacher-register' },
       { name: "Registratsiya hodimlar", link: '/admin/employer-register' },
-      { name: 'Ota-onalar', link: '/admin/parent' },
       { name: "O'quvchilar", link: '/admin/student' },
       { name: "O'qituvchilar", link: '/admin/teacher' },
-      { name: "O'qituvchilar Davomati", link: '/admin/teacher-attandance' },
       { name: "Xodimlar", link: '/admin/employer' },
+      { name: "O'qituvchilar Davomati", link: '/admin/teacher-attandance' },
+      { name: "Yotoqxona Nazorati", link: '/admin/hotel-control' },
       { name: 'Fanlar', link: '/admin/subject' },
+
       { name: 'Moliya', link: '/admin/finence' },
       { name: 'Xabarlar', link: '/admin/message' },
       { name: "E'lonlar", link: '/admin/ads' },
       { name: "Murojaatlar", link: '/admin/application' },
-      { name: "Yotoqxona Nazorati", link: '/admin/hotel-control' },
+
       { name: 'Chiqish', link: '/login' }
     ],
     teacher: [

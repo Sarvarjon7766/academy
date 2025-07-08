@@ -1,28 +1,20 @@
 import axios from 'axios'
 import { useEffect, useState } from 'react'
+import { FiUser } from 'react-icons/fi'
 import { useNavigate } from 'react-router-dom'
-
-// PDF uchun
-import jsPDF from 'jspdf'
-
-// Excel uchun
-import * as XLSX from 'xlsx'
-
-// Word uchun
-import { Document, Packer, Paragraph } from 'docx'
-import { saveAs } from 'file-saver'
 
 const TeachersManage = () => {
   const navigate = useNavigate()
-  const [selectedOption, setSelectedOption] = useState('')
   const [teachers, setTeachers] = useState([])
   const [filteredTeachers, setFilteredTeachers] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedTeacher, setSelectedTeacher] = useState(null)
-  const [modalOpen, setModalOpen] = useState(false)
+  const [updateModalOpen, setUpdateModalOpen] = useState(false)
+  const [detailModalOpen, setDetailModalOpen] = useState(false)
+  const [selectedSection, setSelectedSection] = useState('')
 
   useEffect(() => {
-    const fetchTeacher = async () => {
+    const fetchTeachers = async () => {
       try {
         const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/teacher/getAll`)
         if (res.data.success) {
@@ -35,7 +27,7 @@ const TeachersManage = () => {
       }
     }
 
-    fetchTeacher()
+    fetchTeachers()
   }, [])
 
   const handleSearch = (e) => {
@@ -50,221 +42,329 @@ const TeachersManage = () => {
     setFilteredTeachers(filtered)
   }
 
-  const openModal = (teacher) => {
+  const openUpdateModal = (teacher, e) => {
+    e.stopPropagation()
     setSelectedTeacher(teacher)
-    setModalOpen(true)
+    setUpdateModalOpen(true)
   }
 
-  const closeModal = () => {
-    setSelectedTeacher(null)
-    setModalOpen(false)
+  const openDetailModal = (teacher) => {
+    setSelectedTeacher(teacher)
+    setDetailModalOpen(true)
   }
+
+  const closeModals = () => {
+    setSelectedTeacher(null)
+    setUpdateModalOpen(false)
+    setDetailModalOpen(false)
+  }
+
   const updateHandler = () => {
-    if (!selectedOption) return
+    if (!selectedSection) return
 
     navigate('/admin/teacher-register', {
       state: {
         teacher: selectedTeacher,
-        section: selectedOption,
+        section: selectedSection,
       },
     })
   }
 
   const getLatestSalary = (teacher) => {
-    return  teacher.salaryHistory?.[teacher.salaryHistory.length - 1] || {salary:teacher.salary,share_of_salary:teacher.share_of_salary}
-  }
-
-  const exportToPDF = () => {
-    if (!selectedTeacher) return
-    const latest = getLatestSalary(selectedTeacher)
-    const pdf = new jsPDF()
-
-    pdf.setFontSize(18)
-    pdf.setTextColor(55, 0, 120)
-    pdf.text(selectedTeacher.fullName, 10, 20)
-
-    pdf.setFontSize(12)
-    pdf.setTextColor(0, 0, 0)
-
-    const lines = [
-      `Telefon: ${selectedTeacher.phone}`,
-      `Manzil: ${selectedTeacher.address || '-'}`,
-      `Tug'ilgan sana: ${new Date(selectedTeacher.date_of_birth).toLocaleDateString()}`,
-      `Jins: ${selectedTeacher.gender}`,
-      `Malaka: ${selectedTeacher.qualification}`,
-      `Fanlar: ${selectedTeacher.subjects ? selectedTeacher.subjects.map(s => s.subjectName).join(', ') : selectedTeacher.subjectNames}`,
-      `Oylik maosh: ${latest.salary?.toLocaleString() || 'Nomaʼlum'} UZS`,
-      `Ulushi: ${latest.share_of_salary ?? 'Nomaʼlum'}%`,
-    ]
-
-    let y = 30
-    lines.forEach(line => {
-      pdf.text(line, 10, y)
-      y += 10
-    })
-
-    pdf.save(`${selectedTeacher.fullName}.pdf`)
-  }
-
-  const exportToExcel = () => {
-    const latest = getLatestSalary(selectedTeacher)
-    const worksheet = XLSX.utils.json_to_sheet([
-      { Key: 'Telefon', Value: selectedTeacher.phone },
-      { Key: 'Manzil', Value: selectedTeacher.address || '-' },
-      { Key: 'Tugilgan sana', Value: new Date(selectedTeacher.date_of_birth).toLocaleDateString() },
-      { Key: 'Jins', Value: selectedTeacher.gender },
-      { Key: 'Malaka', Value: selectedTeacher.qualification },
-      { Key: 'Fanlar', Value: selectedTeacher.subjects ? selectedTeacher.subjects.map(s => s.subjectName).join(', ') : selectedTeacher.subjectNames },
-      { Key: 'Oylik maosh', Value: latest.salary?.toLocaleString() + ' UZS' || 'Nomaʼlum' },
-      { Key: 'Ulushi', Value: latest.share_of_salary != null ? latest.share_of_salary + '%' : 'Nomaʼlum' },
-    ])
-    const workbook = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Teacher Info')
-    XLSX.writeFile(workbook, `${selectedTeacher.fullName}.xlsx`)
-  }
-
-  const exportToDocx = () => {
-    const latest = getLatestSalary(selectedTeacher)
-    const doc = new Document({
-      sections: [{
-        children: [
-          new Paragraph({ text: selectedTeacher.fullName, heading: "Heading1" }),
-          new Paragraph({ text: `Telefon: ${selectedTeacher.phone}` }),
-          new Paragraph({ text: `Manzil: ${selectedTeacher.address || '-'}` }),
-          new Paragraph({ text: `Tug'ilgan sana: ${new Date(selectedTeacher.date_of_birth).toLocaleDateString()}` }),
-          new Paragraph({ text: `Jins: ${selectedTeacher.gender}` }),
-          new Paragraph({ text: `Malaka: ${selectedTeacher.qualification}` }),
-          new Paragraph({ text: `Fanlar: ${selectedTeacher.subjects ? selectedTeacher.subjects.map(s => s.subjectName).join(', ') : selectedTeacher.subjectNames}` }),
-          new Paragraph({ text: `Oylik maosh: ${latest.salary?.toLocaleString() || 'Nomaʼlum'} UZS` }),
-          new Paragraph({ text: `Ulushi: ${latest.share_of_salary ?? 'Nomaʼlum'}%` }),
-        ]
-      }]
-    })
-
-    Packer.toBlob(doc).then(blob => {
-      saveAs(blob, `${selectedTeacher.fullName}.docx`)
-    })
+    return teacher.salaryHistory?.[teacher.salaryHistory.length - 1] || { salary: teacher.salary, share_of_salary: teacher.share_of_salary }
   }
 
   return (
-    <div className="p-4 sm:p-6 md:p-8 bg-gradient-to-br from-purple-50 via-white to-purple-50 min-h-screen">
-      <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-purple-900 mb-6 text-center drop-shadow-md">
-        O'qituvchilar Ro'yxati
-      </h2>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-4 md:p-8">
+      <div className="mx-auto">
+        {/* Sarlavha qismi */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-800">
+            O'qituvchilar Boshqaruvi
+          </h1>
+          <p className="text-lg text-gray-600 mt-2">
+            Barcha o'qituvchilar ro'yxati va ularni boshqarish
+          </p>
+        </div>
 
-      <div className="max-w-2xl mx-auto mb-6">
-        <input
-          type="text"
-          placeholder="O'qituvchi ismi, telefon yoki manzil bo'yicha qidirish..."
-          className="w-full border-2 border-purple-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-4 focus:ring-purple-400 focus:border-purple-600 transition"
-          value={searchTerm}
-          onChange={handleSearch}
-        />
+        {/* Qidiruv va jami hisobot */}
+        <div className="mb-6 bg-white rounded-2xl shadow-lg p-4 md:p-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="relative w-full">
+              <input
+                type="text"
+                placeholder="O'qituvchi ismi, telefon yoki manzil bo'yicha qidirish..."
+                className="w-full border-2 border-blue-200 rounded-xl px-5 py-3 focus:outline-none focus:ring-4 focus:ring-blue-300 focus:border-blue-500 transition pl-12"
+                value={searchTerm}
+                onChange={handleSearch}
+              />
+              <svg
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-400 w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                ></path>
+              </svg>
+            </div>
+            <div className="bg-blue-100 text-blue-800 rounded-xl px-4 py-2 font-medium flex items-center whitespace-nowrap">
+              <span className="mr-2">Jami o'qituvchilar:</span>
+              <span className="text-xl font-bold">{filteredTeachers.length}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Jadval qismi */}
+        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-blue-600 text-white">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                    №
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                    Ism Familiya
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                    Telefon
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                    Fanlar
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                    Oylik maosh
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                    Ulushi
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                    Amallar
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredTeachers.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="px-6 py-4 text-center text-gray-500">
+                      O'qituvchilar topilmadi
+                    </td>
+                  </tr>
+                ) : (
+                  filteredTeachers.map((teacher, index) => (
+                    <tr
+                      key={teacher._id}
+                      className="hover:bg-blue-50 cursor-pointer"
+                      onClick={() => openDetailModal(teacher)}
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {index + 1}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="bg-gray-200 border-2 border-dashed rounded-xl w-10 h-10 mr-3 flex items-center justify-center">
+                            <FiUser className="text-blue-600 text-xl" />
+                          </div>
+
+                          <div className="text-sm font-medium text-gray-900">{teacher.fullName}</div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {teacher.phone}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500">
+                        <div className="flex flex-wrap gap-1 max-w-xs">
+                          {teacher.subjects ? (
+                            teacher.subjects.slice(0, 3).map((subject, idx) => (
+                              <span key={idx} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                                {subject.subjectName}
+                              </span>
+                            ))
+                          ) : (
+                            teacher.subjectNames && teacher.subjectNames.split(',').slice(0, 3).map((subject, idx) => (
+                              <span key={idx} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                                {subject.trim()}
+                              </span>
+                            ))
+                          )}
+                          {(teacher.subjects && teacher.subjects.length > 3) && (
+                            <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                              +{teacher.subjects.length - 3}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {getLatestSalary(teacher).salary?.toLocaleString() || 'N/A'} UZS
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-800">
+                          {getLatestSalary(teacher).share_of_salary ?? 'N/A'}%
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button
+                          onClick={(e) => openUpdateModal(teacher, e)}
+                          className="px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold hover:from-blue-600 hover:to-indigo-700 transition duration-300 shadow-md"
+                        >
+                          Yangilash
+                        </button>
+
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
-      <div className="mx-auto border border-purple-300 rounded-lg shadow-sm bg-white overflow-x-auto">
-        <ul className="min-w-full">
-          <li className="hidden sm:grid grid-cols-3 gap-4 bg-blue-200 text-blue-900 font-semibold rounded-t-lg p-3 select-none">
-            <span>Ism Familiya</span>
-            <span>Telefon</span>
-            <span>Manzil</span>
-          </li>
-
-          {filteredTeachers.length === 0 ? (
-            <li className="p-4 text-center text-gray-500">O'qituvchi topilmadi</li>
-          ) : (
-            filteredTeachers.map((teacher) => (
-              <li
-                key={teacher._id}
-                onClick={() => openModal(teacher)}
-                className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 border-t border-purple-100 cursor-pointer hover:bg-purple-50 transition px-3 py-4 items-center"
-              >
-                <span className="font-medium text-purple-800">{teacher.fullName}</span>
-                <span className="text-sm sm:text-base">{teacher.phone}</span>
-                <span className="text-sm sm:text-base">{teacher.address || '-'}</span>
-              </li>
-            ))
-          )}
-        </ul>
-      </div>
-      {modalOpen && selectedTeacher && (
-        <>
-          <div
-            className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40"
-            onClick={closeModal}
-          ></div>
-
-          <div
-            className="fixed inset-0 flex items-center justify-center z-50 px-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="relative bg-white rounded-3xl w-full max-w-3xl p-6 shadow-2xl ring-4 ring-purple-400 max-h-[90vh] overflow-y-auto">
-              <button
-                className="absolute bg-white top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full text-purple-700 hover:text-purple-900 hover:bg-purple-100 transition text-2xl font-bold"
-                onClick={closeModal}
-                aria-label="Modalni yopish"
-              >
-                &times;
-              </button>
-
-              <h3 className="text-2xl sm:text-3xl font-extrabold text-purple-900 mb-6 border-b border-purple-300 pb-3 text-center">
-                {selectedTeacher.fullName}
-              </h3>
-
-              <div className="space-y-3 text-gray-800 text-sm sm:text-base leading-relaxed">
-                <p><span className="font-semibold text-purple-700">Telefon:</span> {selectedTeacher.phone}</p>
-                <p><span className="font-semibold text-purple-700">Manzil:</span> {selectedTeacher.address || '-'}</p>
-                <p><span className="font-semibold text-purple-700">Tug'ilgan sana:</span> {new Date(selectedTeacher.date_of_birth).toLocaleDateString()}</p>
-                <p><span className="font-semibold text-purple-700">Jins:</span> {selectedTeacher.gender}</p>
-                <p><span className="font-semibold text-purple-700">Malaka:</span> {selectedTeacher.qualification}</p>
-                <p><span className="font-semibold text-purple-700">Fanlar:</span> {selectedTeacher.subjects ? selectedTeacher.subjects.map(s => s.subjectName).join(', ') : selectedTeacher.subjectNames}</p>
-                <p><span className="font-semibold text-purple-700">Oylik maosh:</span> {getLatestSalary(selectedTeacher).salary?.toLocaleString() || 'Nomaʼlum'} UZS</p>
-                <p><span className="font-semibold text-purple-700">Ulushi:</span> {getLatestSalary(selectedTeacher).share_of_salary ?? 'Nomaʼlum'}%</p>
+      {/* O'qituvchi ma'lumotlari modal oynasi */}
+      {detailModalOpen && selectedTeacher && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 text-white rounded-t-2xl">
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold">{selectedTeacher.fullName}</h2>
+                <button
+                  onClick={closeModals}
+                  className="text-white bg-indigo-700 hover:text-blue-200 transition-colors"
+                >
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                </button>
               </div>
+              <p className="text-blue-200 mt-1">{selectedTeacher.phone}</p>
+            </div>
 
-              <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                <select
-                  className="border border-purple-400 rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm sm:text-base"
-                  value={selectedOption}
-                  onChange={(e) => setSelectedOption(e.target.value)}
-                >
-                  <option value="">Tanlang</option>
-                  <option value="0">Shaxsiy</option>
-                  <option value="1">Fan</option>
-                  <option value="2">Oylik</option>
-                </select>
+            <div className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-blue-50 rounded-xl p-5">
+                  <h3 className="text-lg font-semibold text-blue-800 mb-3">Shaxsiy ma'lumotlar</h3>
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-sm text-blue-600">Manzil</p>
+                      <p className="text-gray-800">{selectedTeacher.address || 'Manzil kiritilmagan'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-blue-600">Tug'ilgan sana</p>
+                      <p className="text-gray-800">{new Date(selectedTeacher.date_of_birth).toLocaleDateString()}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-blue-600">Jins</p>
+                      <p className="text-gray-800">{selectedTeacher.gender}</p>
+                    </div>
+                  </div>
+                </div>
 
-                <button
-                  onClick={updateHandler}
-                  className="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-md w-full shadow-sm transition duration-200 text-sm sm:text-base"
-                >
-                  Yangilash
-                </button>
+                <div className="bg-indigo-50 rounded-xl p-5">
+                  <h3 className="text-lg font-semibold text-indigo-800 mb-3">Kasbiy ma'lumotlar</h3>
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-sm text-indigo-600">Malaka</p>
+                      <p className="text-gray-800">{selectedTeacher.qualification}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-indigo-600">O'qitadigan fanlar</p>
+                      <p className="text-gray-800">
+                        {selectedTeacher.subjects ?
+                          selectedTeacher.subjects.map(s => s.subjectName).join(', ') :
+                          selectedTeacher.subjectNames}
+                      </p>
+                    </div>
+                  </div>
+                </div>
 
-                <button
-                  onClick={exportToPDF}
-                  className="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-md w-full shadow-sm transition duration-200 text-sm sm:text-base"
-                >
-                  PDF yuklash
-                </button>
-
-                <button
-                  onClick={exportToExcel}
-                  className="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-md w-full shadow-sm transition duration-200 text-sm sm:text-base"
-                >
-                  Excel yuklash
-                </button>
-
-                <button
-                  onClick={exportToDocx}
-                  className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md w-full shadow-sm transition duration-200 text-sm sm:text-base"
-                >
-                  Word yuklash
-                </button>
+                <div className="bg-green-50 rounded-xl p-5 md:col-span-2">
+                  <h3 className="text-lg font-semibold text-green-800 mb-3">Moliyaviy ma'lumotlar</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-green-600">Oylik maosh</p>
+                      <p className="text-2xl font-bold text-gray-800">
+                        {getLatestSalary(selectedTeacher).salary?.toLocaleString() || 'N/A'} UZS
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-green-600">Ulushi</p>
+                      <p className="text-2xl font-bold text-gray-800">
+                        {getLatestSalary(selectedTeacher).share_of_salary ?? 'N/A'}%
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </>
+        </div>
+      )}
+
+      {/* Yangilash modal oynasi */}
+      {updateModalOpen && selectedTeacher && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
+            <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 text-white rounded-t-2xl">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-bold">Ma'lumotlarni yangilash</h2>
+                <button
+                  onClick={closeModals}
+                  className="text-white bg-indigo-600 hover:text-blue-200 transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                </button>
+              </div>
+              <p className="text-blue-200 mt-1">{selectedTeacher.fullName}</p>
+            </div>
+
+            <div className="p-6">
+              <div className="mb-5">
+                <label className="block text-gray-700 text-sm font-medium mb-2">
+                  Yangilash bo'limini tanlang
+                </label>
+                <select
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  value={selectedSection}
+                  onChange={(e) => setSelectedSection(e.target.value)}
+                >
+                  <option value="">Tanlang</option>
+                  <option value="0">Shaxsiy ma'lumotlar</option>
+                  <option value="1">Fanlar</option>
+                  <option value="2">Oylik maosh</option>
+                </select>
+              </div>
+
+              <div className="flex flex-col sm:flex-row justify-end items-center gap-3 mt-6">
+                <button
+                  onClick={closeModals}
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-lg border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 transition duration-300 shadow-sm"
+                >
+                  Bekor qilish
+                </button>
+
+                <button
+                  onClick={updateHandler}
+                  disabled={!selectedSection}
+                  className={`w-full sm:w-auto px-5 py-2.5 rounded-lg font-semibold text-white transition duration-300 shadow-sm ${selectedSection
+                      ? 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700'
+                      : 'bg-gray-400 cursor-not-allowed'
+                    }`}
+                >
+                  Yangilash
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

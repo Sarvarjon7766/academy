@@ -7,7 +7,7 @@ import StudentList from './page/admin/StudentList.jsx'
 import TeacherAttandance from './page/admin/teacher/TeacherAttandance.jsx'
 import { EmployerList, EmployerRegister } from './page/admin/employer/index.js'
 import TeacherRegister from './page/admin/teacher/TeacherRegister.jsx'
-import { AttandanseSunday, RegisterDashboard, RegisterHome, RegisterHostel, RegisterMessage, RegisterPayment, RegisterProfile, RegisterRefund, StudentsRegister, StudentStatusManager, UpdateStudent } from './page/register/index.js'
+import { AttandanseSunday, RegisterDashboard, RegisterHome, RegisterHostel, RegisterMessage, RegisterPayment, RegisterProfile, RegisterRefund, StudentsRegister, StudentStatusManager, UpdateStudent,StudentListRegister } from './page/register/index.js'
 import { Attendance, Grades, Schedule, TeacherDashboard, TeacherHome, TeacherMessage, TeacherProfile, TeacherSubject } from './page/teacher/index.js'
 
 
@@ -23,6 +23,7 @@ const App = () => {
           <Route path="parent" element={<ParentsManage />} />
           <Route path="student" element={<StudentList />} />
           <Route path="student-register" element={<StudentsRegister />} />
+          <Route path="student-update" element={<UpdateStudent />} />
           <Route path="teacher" element={<TeachersManage />} />
           <Route path="teacher-register" element={<TeacherRegister />} />
           <Route path="employer-register" element={<EmployerRegister />} />
@@ -53,7 +54,7 @@ const App = () => {
           <Route path="student-payment" element={<RegisterPayment />} />
           <Route path="student-refund" element={<RegisterRefund />} />
           <Route path="student-refund" element={<RegisterRefund />} />
-          <Route path="student-list" element={<StudentList />} />
+          <Route path="student-list" element={<StudentListRegister />} />
           <Route path="hostel" element={<RegisterHostel />} />
           <Route path="message" element={<RegisterMessage />} />
           <Route path="attandance-sunday" element={<AttandanseSunday />} />

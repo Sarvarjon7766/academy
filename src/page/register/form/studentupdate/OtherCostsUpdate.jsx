@@ -115,10 +115,8 @@ const OtherCostsUpdate = ({ student }) => {
 	}
 
 	return (
-		<div className="max-w-3xl mx-auto p-4 bg-white rounded-lg shadow-lg border border-gray-200">
-			<h2 className="text-xl text-center font-bold p-4 text-indigo-400">
-			{student.fullName}ning	qo'shimcha Xizmatlarni yangilash
-			</h2>
+		<div className="mx-auto p-4 bg-white rounded-lg shadow-lg border border-gray-200">
+		
 
 			{error && (
 				<div className="bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded mb-4 text-sm">

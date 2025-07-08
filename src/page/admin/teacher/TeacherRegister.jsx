@@ -1,14 +1,15 @@
 import axios from "axios"
 import { useEffect, useState } from "react"
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import ProgressBar3 from '../../../components/ProgressBar3'
 import AddSubjectAdd from './form/AddSubjectAdd'
 import OtherCosts from './form/OtherCosts'
 import SubjectAdd from './form/SubjectAdd'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 const TeacherRegister = () => {
   const location = useLocation()
-  const navigate = useNavigate()
   const { teacher, section } = location.state || {}
 
   const defaultForm = {
@@ -28,9 +29,6 @@ const TeacherRegister = () => {
   const [isAvailable, setIsAvailable] = useState(0)
 
   useEffect(() => {
-    console.log(teacher)
-    console.log(section)
-    // Agar teacher mavjud bo‘lsa, formni to‘ldirish
     if (teacher) {
       setFormData({
         fullName: teacher.fullName || '',
@@ -46,7 +44,6 @@ const TeacherRegister = () => {
       setTeacherId(teacher._id || teacher.id || null)
     }
 
-    // Agar section mavjud bo‘lsa, isAvailable ni o‘rnatish
     if (section !== undefined && section !== null) {
       setIsAvailable(Number(section))
     }
@@ -56,36 +53,31 @@ const TeacherRegister = () => {
     setFormData(prev => ({ ...prev, [name]: value }))
 
   const handleSubmit = async (e) => {
-  e.preventDefault()
-  try {
-    let res
-    if (teacher && section !== undefined) {
-      // teacher va section mavjud bo'lsa PUT so'rov
-      res = await axios.put(
-        `${import.meta.env.VITE_API_URL}/api/teacher/create-personal/${teacher._id}`, // update endpoint, o'zgartiring kerak bo'lsa
-        formData,
-        { headers: { "Content-Type": "application/json" } }
-      )
+    e.preventDefault()
+    try {
+      let res
+      if (teacher && section !== undefined) {
+        res = await axios.put(
+          `${import.meta.env.VITE_API_URL}/api/teacher/create-personal/${teacher._id}`,
+          formData,
+          { headers: { "Content-Type": "application/json" } }
+        )
+      } else {
+        res = await axios.post(
+          `${import.meta.env.VITE_API_URL}/api/teacher/create-personal`,
+          formData,
+          { headers: { "Content-Type": "application/json" } }
+        )
+      }
 
-    } else {
-      // yo'q bo'lsa POST so'rov yuboriladi
-      res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/teacher/create-personal`,
-        formData,
-        { headers: { "Content-Type": "application/json" } }
-      )
-      console.log(res.data)
+      toast.success(res.data.message)
+      setTeacherId(res.data.teacher._id)
+      setIsAvailable(res.data.success ? 1 : 0)
+
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Xatolik yuz berdi")
     }
-    
-    alert(res.data.message)
-    setTeacherId(res.data.teacher._id)
-    setIsAvailable(res.data.success ? 1 : 0)
-
-  } catch (err) {
-    alert(err?.response?.data?.message || "Xatolik yuz berdi")
   }
-}
-
 
   const handlerExit = () => {
     setTeacherId(null)
@@ -105,14 +97,22 @@ const TeacherRegister = () => {
   ]
 
   return (
-    <div className="w-full bg-gradient-to-br from-indigo-50 to-blue-100 min-h-screen py-10 px-4">
+    <div className="w-full bg-gradient-to-br from-indigo-100 via-blue-100 to-purple-100 min-h-screen py-10 px-4">
+      <ToastContainer />
       <div className="max-w-6xl mx-auto space-y-10">
+
         <ProgressBar3 isAvailable={isAvailable} />
 
+        {/* 1-step: Foydalanuvchi formasi */}
         {isAvailable === 0 && (
-          <div className=" p-8 rounded-2xl shadow-lg">
-            <h2 className="text-3xl font-bold text-center text-blue-700 mb-6">👨‍🏫 O‘qituvchini Ro‘yxatga Olish</h2>
-            <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="bg-white p-8 rounded-2xl shadow-xl border border-indigo-100 transition-all">
+            <h2 className="text-3xl font-bold text-center text-indigo-700 mb-6">
+              👨‍🏫 O‘qituvchini Ro‘yxatga Olish
+            </h2>
+            <form
+              onSubmit={handleSubmit}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+            >
               {inputs.map(({ label, name, placeholder, type, options }) => (
                 <div key={name} className="flex flex-col">
                   <label htmlFor={name} className="text-sm font-medium text-gray-700 mb-1">{label}</label>
@@ -145,7 +145,7 @@ const TeacherRegister = () => {
               <div className="col-span-full flex justify-center mt-4">
                 <button
                   type="submit"
-                  className="bg-indigo-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-indigo-700 transition duration-300"
+                  className="bg-indigo-600 text-white font-semibold px-8 py-3 rounded-lg hover:bg-indigo-700 transition duration-300 shadow-md"
                 >
                   Ro'yxatdan o'tkazish
                 </button>
@@ -154,18 +154,37 @@ const TeacherRegister = () => {
           </div>
         )}
 
-        {isAvailable === 1 && <SubjectAdd teacherId={teacherId} onSuccess={() => setIsAvailable(2)} />}
-        {isAvailable === 2 && <AddSubjectAdd teacherId={teacherId} onSuccess={() => setIsAvailable(3)} />}
-        {isAvailable === 3 && (
-          <OtherCosts
-            teacherId={teacherId}
-            onSuccess={() => {
-              setIsAvailable(0)
-              handlerExit()
-            }}
-            handlerExit={handlerExit}
-          />
+        {/* 2-step: Fan tanlash */}
+        {isAvailable === 1 && (
+          <div className="bg-white p-6 rounded-2xl shadow-lg border border-blue-100 transition">
+            <h2 className="text-xl font-semibold text-blue-600 mb-4">📘 Fanlarni tanlang</h2>
+            <SubjectAdd teacherId={teacherId} onSuccess={() => setIsAvailable(2)} />
+          </div>
         )}
+
+        {/* 3-step: Asosiy fanlarni tanlash */}
+        {isAvailable === 2 && (
+          <div className="bg-white p-6 rounded-2xl shadow-lg border border-green-100 transition">
+            <h2 className="text-xl font-semibold text-green-600 mb-4">📚 Asosiy fanlarni tanlang</h2>
+            <AddSubjectAdd teacherId={teacherId} onSuccess={() => setIsAvailable(3)} />
+          </div>
+        )}
+
+        {/* 4-step: Qo‘shimcha xizmatlar */}
+        {isAvailable === 3 && (
+          <div className="bg-white p-6 rounded-2xl shadow-lg border border-emerald-100 transition">
+            <h2 className="text-xl font-semibold text-emerald-600 mb-4">🔧 Qo‘shimcha xizmatlar</h2>
+            <OtherCosts
+              teacherId={teacherId}
+              onSuccess={() => {
+                setIsAvailable(0)
+                handlerExit()
+              }}
+              handlerExit={handlerExit}
+            />
+          </div>
+        )}
+
       </div>
     </div>
   )

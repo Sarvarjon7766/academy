@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: my-react-app
+    name: frontend
     env: static
     buildCommand: npm run build
     staticPublishPath: build

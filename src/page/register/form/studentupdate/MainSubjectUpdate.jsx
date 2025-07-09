@@ -157,6 +157,9 @@ const MainSubjectUpdate = ({ student, onSuccess }) => {
     try {
       setError(null)
       setIsSubmitting(true)
+      console.log(selectedData)
+      console.log(main_subject)
+      console.log(student._id)
       const res = await axios.put(
         `${import.meta.env.VITE_API_URL}/api/student/update-main/${student._id}`,
         { newsubjects: selectedData, oldsubjects: main_subject },

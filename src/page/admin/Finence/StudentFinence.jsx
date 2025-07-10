@@ -16,7 +16,8 @@ import {
   Tooltip,
   XAxis, YAxis,
 } from 'recharts'
-import StudentsMonthlyReport from './StudentsMonthlyReport' // Agar bor bo'lsa
+
+import MonthlyPaymentControl from '../../register/MonthlyPaymentControl'
 import UnderpaidReport from './UnderpaidReport'
 
 const barData = [
@@ -95,32 +96,6 @@ const StudentFinance = () => {
     fetchStudents()
   }, [year, month])
 
-  // Talabalar jadvalini chizish uchun yordamchi funksiya
-  const renderTable = (students, title) => (
-    <div className="mt-6">
-      <h3 className="text-2xl font-semibold mb-4">{title}</h3>
-      <table className="min-w-full border-collapse border border-gray-300">
-        <thead>
-          <tr className="bg-gray-200">
-            <th className="border border-gray-300 px-4 py-2">Ism</th>
-            <th className="border border-gray-300 px-4 py-2">Guruh</th>
-            <th className="border border-gray-300 px-4 py-2">To‘langan summa</th>
-            <th className="border border-gray-300 px-4 py-2">Qarzdorlik</th>
-          </tr>
-        </thead>
-        <tbody>
-          {students.map((student, index) => (
-            <tr key={index} className="text-center border border-gray-300">
-              <td className="border border-gray-300 px-4 py-2">{student.name}</td>
-              <td className="border border-gray-300 px-4 py-2">{student.group}</td>
-              <td className="border border-gray-300 px-4 py-2">{student.paid.toLocaleString()}</td>
-              <td className="border border-gray-300 px-4 py-2">{student.debt.toLocaleString()}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  )
 
   return (
     <div className="p-4 bg-white rounded-lg shadow-md  min-h-screen mx-auto space-y-10">
@@ -141,22 +116,6 @@ const StudentFinance = () => {
         >
           <FaCalendarAlt />
           Oylik hisobot
-        </button>
-
-        <button
-          onClick={() => setActiveTab('partial')}
-          className={`flex items-center gap-2 px-4 py-2 rounded ${activeTab === 'partial' ? 'bg-yellow-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-        >
-          <FaMoneyBillWave />
-          Qisman to‘laganlar
-        </button>
-
-        <button
-          onClick={() => setActiveTab('debt')}
-          className={`flex items-center gap-2 px-4 py-2 rounded ${activeTab === 'debt' ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-        >
-          <FaExclamationTriangle />
-          Qarzdorlar
         </button>
       </div>
 
@@ -247,20 +206,7 @@ const StudentFinance = () => {
         </>
       )}
 
-      {activeTab === 'monthly-report' && (
-        <div className="mt-6">
-          {/* Agar StudentsMonthlyReport komponentingiz bor bo'lsa uni shu yerga qo'ying */}
-          <StudentsMonthlyReport />
-        </div>
-      )}
-
-      {activeTab === 'partial' &&  (
-        <div className='mt-6'>
-          <UnderpaidReport />
-        </div>
-      )}
-
-      {activeTab === 'debt' && renderTable(debtStudents, 'Qarzdor Talabalar')}
+      {activeTab === 'monthly-report' && (<MonthlyPaymentControl />)}
     </div>
   )
 }

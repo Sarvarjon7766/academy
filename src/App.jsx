@@ -7,7 +7,7 @@ import StudentList from './page/admin/StudentList.jsx'
 import TeacherAttandance from './page/admin/teacher/TeacherAttandance.jsx'
 import { EmployerList, EmployerRegister } from './page/admin/employer/index.js'
 import TeacherRegister from './page/admin/teacher/TeacherRegister.jsx'
-import { AttandanseSunday, RegisterDashboard, RegisterHome, RegisterHostel, RegisterMessage, RegisterPayment, RegisterProfile, RegisterRefund, StudentsRegister, StudentStatusManager, UpdateStudent,StudentListRegister } from './page/register/index.js'
+import { AttandanseSunday, RegisterDashboard, RegisterHome, RegisterHostel, RegisterMessage, RegisterPayment, RegisterProfile, RegisterRefund, StudentsRegister, StudentStatusManager, UpdateStudent,StudentListRegister,MonthlyPaymentControl } from './page/register/index.js'
 import { Attendance, Grades, Schedule, TeacherDashboard, TeacherHome, TeacherMessage, TeacherProfile, TeacherSubject } from './page/teacher/index.js'
 
 
@@ -52,6 +52,7 @@ const App = () => {
           <Route path="student-update" element={<UpdateStudent />} />
           <Route path="student-status-manager" element={<StudentStatusManager />} />
           <Route path="student-payment" element={<RegisterPayment />} />
+          <Route path="monthly-debts" element={<MonthlyPaymentControl />} />
           <Route path="student-refund" element={<RegisterRefund />} />
           <Route path="student-refund" element={<RegisterRefund />} />
           <Route path="student-list" element={<StudentListRegister />} />

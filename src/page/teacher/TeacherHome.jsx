@@ -4,210 +4,302 @@ import { useNavigate } from "react-router-dom"
 import { VscAdd } from "react-icons/vsc"
 import { MdOutlineMenuBook } from "react-icons/md"
 import { FaChalkboardTeacher } from "react-icons/fa"
-import { BsPeopleFill } from "react-icons/bs"
-import { IoMdAlert } from "react-icons/io"
+import { BsPeopleFill, BsFillCheckCircleFill } from "react-icons/bs"
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const TeacherHome = () => {
-	const navigate = useNavigate()
-	const token = localStorage.getItem('token')
-	const [subjects, setSubjects] = useState([])
-	const [headers, setHeaders] = useState({})
-	const [teacherId, setTeacherId] = useState()
-	const [selectSubject, setSelectSubject] = useState()
-	const [groups, setGroups] = useState([])
-	const [isCreate, setIsCreate] = useState(false)
-	const [apimessage, setApiMessage] = useState(null)
-	const [checkStudent, setCheckStudent] = useState(null)
-	const [formData, setFormData] = useState({ groupName: "" })
+  const navigate = useNavigate()
+  const token = localStorage.getItem('token')
+  const [subjects, setSubjects] = useState([])
+  const [headers, setHeaders] = useState({})
+  const [teacherId, setTeacherId] = useState()
+  const [selectSubject, setSelectSubject] = useState()
+  const [groups, setGroups] = useState([])
+  const [isCreate, setIsCreate] = useState(false)
+  const [formData, setFormData] = useState({ groupName: "" })
 
-	useEffect(() => {
-		const fetchSubjects = async () => {
-			if (!token) {
-				navigate('/login')
-				return
-			}
-			try {
-				const headers = { Authorization: `Bearer ${token}` }
-				const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/teacher/getSubjects`, { headers })
-				setTeacherId(res.data.teacherid)
-			} catch (error) {
-				if (error.response?.status === 401 || error.response?.status === 403) {
-					navigate('/login')
-				} else {
-					console.error("API Error:", error)
-				}
-			}
-		}
-		fetchSubjects()
-	}, [token, navigate])
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      if (!token) {
+        navigate('/login')
+        return
+      }
+      try {
+        const headers = { Authorization: `Bearer ${token}` }
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/teacher/getSubjects`, { headers })
+        setTeacherId(res.data.teacherid)
+      } catch (error) {
+        if (error.response?.status === 401 || error.response?.status === 403) {
+          navigate('/login')
+        } else {
+          console.error("API Error:", error)
+        }
+      }
+    }
+    fetchSubjects()
+  }, [token, navigate])
 
-	const fetchData = async () => {
-		try {
-			const headers = token ? { Authorization: `Bearer ${token}` } : {}
-			const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/teacher/getSubjects`, { headers })
-			setSubjects(res.data.subjects || [])
-			setHeaders(headers)
-		} catch (error) {
-			console.error("Error fetching data:", error)
-		}
-	}
-	useEffect(() => { fetchData() }, [])
+  const fetchData = async () => {
+    try {
+      const headers = token ? { Authorization: `Bearer ${token}` } : {}
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/teacher/getSubjects`, { headers })
+      setSubjects(res.data.subjects || [])
+      setHeaders(headers)
+    } catch (error) {
+      console.error("Error fetching data:", error)
+    }
+  }
+  
+  useEffect(() => { 
+    fetchData() 
+  }, [])
 
-	useEffect(() => {
-		setApiMessage(null)
-	}, [apimessage])
+  const handleGroup = async (subject) => {
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/group/groups/${subject._id}`, { headers })
+      if (res.data.groups.length !== 0) {
+        setGroups(res.data.groups)
+      } else {
+        toast.info(`${subject.subjectName} fanida hali guruhlar mavjud emas`, {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      }
+      setSelectSubject(subject)
+      setIsCreate(false)
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
-	useEffect(() => {
-		if (checkStudent !== null) {
-			const timer = setTimeout(() => {
-				setCheckStudent(null)
-				setApiMessage(null)
-			}, 10000)
-			return () => clearTimeout(timer)
-		}
-	}, [checkStudent, apimessage])
+  const handleCreateGroup = async (subject, formDatas) => {
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/group/create-group/${subject._id}`,
+        formDatas,
+        { headers }
+      )
+      if (res.data.success === false) {
+        toast.error(res.data.message, {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      } else {
+        toast.success("Guruh muvaffaqiyatli yaratildi!", {
+          position: "top-right",
+          autoClose: 2000,
+          icon: <BsFillCheckCircleFill className="text-green-500 text-xl" />
+        });
+        setSelectSubject([])
+        setIsCreate(false)
+        fetchData()
+        handleGroup(subject)
+        setFormData({ groupName: "" })
+      }
+    } catch (error) {
+      console.log(error)
+      toast.error("Guruh yaratishda xatolik yuz berdi", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    }
+  }
 
-	const handleGroup = async (subject) => {
-		try {
-			const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/group/groups/${subject._id}`, { headers })
-			if (res.data.groups.length !== 0) {
-				setGroups(res.data.groups)
-			} else {
-				setApiMessage(res.data.message)
-			}
-			setSelectSubject(subject)
-			setIsCreate(false)
-		} catch (error) {
-			console.error(error)
-		}
-	}
+  const handleAttandance = async (groupId) => {
+    if (!groupId) {
+      toast.error("Iltimos, guruhni tanlang!", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      return
+    }
+    try {
+      const headers = token ? { Authorization: `Bearer ${token}` } : {}
+      const [res, response] = await Promise.all([
+        axios.get(`${import.meta.env.VITE_API_URL}/api/group/groups-v3/${groupId}`),
+        axios.get(`${import.meta.env.VITE_API_URL}/api/attandance/checking/${groupId}`, { headers })
+      ])
 
-	const handleCreateGroup = async (subject, formDatas) => {
-		try {
-			const res = await axios.post(
-				`${import.meta.env.VITE_API_URL}/api/group/create-group/${subject._id}`,
-				formDatas,
-				{ headers }
-			)
-			if (res.data.success === false) {
-				setApiMessage(res.data.message)
-			}
-			setSelectSubject([])
-			setIsCreate(false)
-			fetchData()
-			handleGroup(subject)
-			setApiMessage(res.data.message)
-		} catch (error) {
-			console.log(error)
-		}
-	}
+      if (res.data.success && response.data.success) {
+        toast.success("Davomatni belgilash sahifasiga o'tilmoqda...", {
+          position: "top-right",
+          autoClose: 1500,
+        });
+        setTimeout(() => {
+          navigate('/teacher/attendance', {
+            state: {
+              teacherId: teacherId,
+              groupId,
+              students: response.data.students
+            }
+          })
+        }, 1700);
+      } else {
+        toast.error(res.data.success ? response.data.message : res.data.message, {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      }
+    } catch (error) {
+      console.error('Xatolik yuz berdi:', error)
+      toast.error("Tarmoq xatosi yoki serverda muammo bor", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    }
+  }
 
-	const handleAttandance = async (groupId) => {
-		if (!groupId) {
-			setCheckStudent("Guruh tanlanmagan!")
-			return
-		}
-		try {
-			const headers = token ? { Authorization: `Bearer ${token}` } : {}
-			const [res, response] = await Promise.all([
-				axios.get(`${import.meta.env.VITE_API_URL}/api/group/groups-v3/${groupId}`),
-				axios.get(`${import.meta.env.VITE_API_URL}/api/attandance/checking/${groupId}`, { headers })
-			])
-			console.log(res.data)
+  return (
+    <div className="p-4 bg-gradient-to-br from-indigo-50 to-blue-100 min-h-screen">
+      <ToastContainer 
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        className="mt-14"
+      />
+      
+      <div className="mx-auto p-6">
 
-			if (res.data.success && response.data.success) {
-				navigate('/teacher/attendance', {
-					state: {
-						teacherId: teacherId,
-						groupId,
-						students: response.data.students
-					}
-				})
-			} else {
-				setCheckStudent(res.data.success ? response.data.message : res.data.message)
-				setApiMessage(response.data.message)
-			}
-		} catch (error) {
-			console.error('Xatolik yuz berdi:', error)
-			setCheckStudent("Tarmoq xatosi yoki serverda muammo bor.")
-		}
-	}
 
-	return (
-		<div className="p-4 bg-gradient-to-br from-indigo-100 to-blue-100 min-h-screen">
-			{checkStudent && (
-				<div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 flex items-center gap-2 text-red-600 bg-white p-3 rounded-md  shadow-md">
-					<IoMdAlert size={20} />
-					{checkStudent}
-				</div>
-			)}
+        {/* Fanlar ro'yxati */}
+        <div className="mb-10">
+          
+          {subjects.length === 0 ? (
+            <div className="text-center py-10 bg-white rounded-xl shadow-md">
+              <p className="text-gray-500 text-lg">Sizda hali fanlar mavjud emas</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+              {subjects.map((subject) => (
+                <button 
+                  key={subject._id} 
+                  onClick={() => handleGroup(subject)}
+                  className={`group p-5 bg-gradient-to-br from-white to-indigo-50 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-2 ${
+                    selectSubject?._id === subject._id 
+                      ? "border-indigo-500 ring-2 ring-indigo-200" 
+                      : "border-transparent"
+                  }`}
+                >
+                  <div className="flex flex-col items-center text-indigo-700">
+                    <div className="bg-indigo-100 p-3 rounded-full mb-3">
+                      <MdOutlineMenuBook size={32} className="text-indigo-600" />
+                    </div>
+                    <h2 className="mt-1 font-bold text-lg text-center text-indigo-900 group-hover:text-indigo-700 transition-colors">
+                      {subject.subjectName}
+                    </h2>
+                    <p className="text-sm text-gray-500 mt-1">{subject.subjectCode}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
 
-			<div className="max-w-6xl mx-auto p-6">
-				<div className="flex items-center justify-center gap-3 mb-4">
-					<FaChalkboardTeacher size={32} className="text-indigo-600" />
-					<h1 className="text-3xl font-bold text-indigo-700">O'qituvchi Paneli</h1>
-				</div>
-				<hr className="border-t-4 border-blue-300 mb-10" />
+        {/* Tanlangan fan uchun guruhlar */}
+        {selectSubject && (
+          <div className="mt-10 p-6 bg-white rounded-2xl shadow-lg border border-indigo-100 animate-fadeIn">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-bold text-indigo-800 flex items-center gap-2">
+                <BsPeopleFill className="text-indigo-600" />
+                {selectSubject.subjectName} - Guruhlar
+              </h3>
+              
+              <button 
+                onClick={() => setIsCreate(prev => !prev)} 
+                className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-2 rounded-xl hover:shadow-md transition-all duration-300"
+              >
+                <VscAdd /> 
+                {isCreate ? "Bekor qilish" : "Guruh qo'shish"}
+              </button>
+            </div>
 
-				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-					{subjects.map((subject) => (
-						<button key={subject._id} onClick={() => handleGroup(subject)} className="group p-4 bg-white border-none border-indigo-200 rounded-lg shadow hover:shadow-lg transition">
-							<div className="flex flex-col items-center text-indigo-600">
-								<MdOutlineMenuBook size={36} />
-								<h2 className="mt-2 font-semibold text-center text-indigo-800">{subject.subjectName}</h2>
-							</div>
-						</button>
-					))}
-				</div>
+            {isCreate && (
+              <form 
+                onSubmit={(e) => { 
+                  e.preventDefault(); 
+                  handleCreateGroup(selectSubject, formData) 
+                }} 
+                className="space-y-4 mb-8 p-5 bg-indigo-50 rounded-xl border border-indigo-200 animate-fadeIn"
+              >
+                <div className="flex gap-3 items-center">
+                  <input
+                    type="text"
+                    name="groupName"
+                    placeholder="Guruh nomi"
+                    value={formData.groupName}
+                    onChange={(e) => setFormData({ groupName: e.target.value })}
+                    className="flex-1 p-3 border border-indigo-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    required
+                  />
+                  <button 
+                    type="submit" 
+                    className="bg-gradient-to-r from-indigo-600 to-blue-600 text-white px-6 py-3 rounded-xl hover:shadow-md transition-all"
+                  >
+                    Yaratish
+                  </button>
+                </div>
+              </form>
+            )}
 
-				{selectSubject && (
-					<div className="mt-10">
-						<button onClick={() => setIsCreate(prev => !prev)} className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition mb-4">
-							<VscAdd /> Guruh qo'shish
-						</button>
+            {groups.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                {groups.map((group) => (
+                  <button 
+                    key={group._id} 
+                    onClick={() => handleAttandance(group._id)} 
+                    className="p-5 bg-gradient-to-br from-green-50 to-emerald-50 text-emerald-800 rounded-2xl shadow hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border border-emerald-200 relative group"
+                  >
+                    <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <BsFillCheckCircleFill className="text-emerald-500" />
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <div className="bg-emerald-100 p-3 rounded-full mb-3">
+                        <BsPeopleFill size={24} className="text-emerald-600" />
+                      </div>
+                      <h4 className="font-bold text-lg">{group.groupName}</h4>
+                      <p className="text-sm text-emerald-600 mt-1">Davomat belgilash</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-10 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-indigo-100">
+                <BsPeopleFill size={48} className="text-indigo-300 mx-auto mb-4" />
+                <h4 className="text-lg font-medium text-indigo-700">Guruhlar mavjud emas</h4>
+                <p className="text-indigo-500 mt-2">"Guruh qo'shish" tugmasi orqali yangi guruh yarating</p>
+              </div>
+            )}
+          </div>
+        )}
 
-						{isCreate && (
-							<form onSubmit={(e) => { e.preventDefault(); handleCreateGroup(selectSubject, formData) }} className="space-y-4">
-								<input
-									type="text"
-									name="groupName"
-									placeholder="Guruh nomi"
-									value={formData.groupName}
-									onChange={(e) => setFormData({ groupName: e.target.value })}
-									className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-									required
-								/>
-								<button type="submit" className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition">
-									Qo‘shish
-								</button>
-							</form>
-						)}
-
-						{groups.length > 0 && (
-							<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
-								{groups.map((group) => (
-									<button key={group._id} onClick={() => handleAttandance(group._id)} className="p-4 bg-green-500 text-white rounded-lg shadow hover:shadow-lg transition text-center">
-										<BsPeopleFill size={24} className="mx-auto mb-2" />
-										<h4 className="font-semibold">{group.groupName}</h4>
-									</button>
-								))}
-							</div>
-						)}
-
-						{apimessage && !isCreate && (
-							<p className="mt-4 text-center text-blue-600">{apimessage}</p>
-						)}
-					</div>
-				)}
-
-				{!selectSubject && (
-					<div className="text-center mt-10 text-indigo-700 text-xl font-medium">
-						Birorta fanni tanlang
-					</div>
-				)}
-			</div>
-		</div>
-	)
+        {!selectSubject && (
+          <div className="text-center mt-16 py-10 bg-gradient-to-br from-white to-blue-50 rounded-2xl shadow-md border border-indigo-100">
+            <MdOutlineMenuBook size={64} className="text-indigo-300 mx-auto mb-4" />
+            <h3 className="text-xl font-medium text-indigo-700">Fan tanlang</h3>
+            <p className="text-indigo-500 mt-2">Yuqoridagi fanlardan birini tanlab, guruhlarni boshqaring</p>
+          </div>
+        )}
+      </div>
+      
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.4s ease-out forwards;
+        }
+      `}</style>
+    </div>
+  )
 }
 
 export default TeacherHome

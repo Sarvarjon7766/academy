@@ -105,14 +105,6 @@ const StudentListRegister = () => {
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4 sm:p-6">
 			<div className="mx-auto">
-				<div className="mb-8 text-center">
-					<h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 mb-2">
-						Talabalar Boshqaruvi
-					</h1>
-					<p className="text-gray-600 max-w-2xl mx-auto">
-						Barcha talabalar ro'yxati va ularning to'liq ma'lumotlari
-					</p>
-				</div>
 
 				{/* Search and Stats Bar */}
 				<div className="bg-white rounded-2xl shadow-lg p-4 mb-6 flex flex-col md:flex-row items-center justify-between gap-4">

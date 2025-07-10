@@ -73,7 +73,7 @@ const TeacherProfile = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center">
           <img
-            src={photo}
+            
             alt="Teacher"
             className="w-36 h-36 object-cover rounded-full border-4 border-indigo-300 shadow-md"
           />

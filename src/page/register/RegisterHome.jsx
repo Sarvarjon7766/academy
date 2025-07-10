@@ -67,5 +67,9 @@ const RegisterHome = () => {
   );
 };
 
+
 export default RegisterHome;
+
+
+
 

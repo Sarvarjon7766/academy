@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { useEffect, useState } from 'react'
-import { FaUserGraduate, FaBirthdayCake, FaVenusMars, FaSchool, FaPhone, FaMapMarkerAlt, FaLock, FaMoneyBillWave, FaBook, FaPlus, FaCheck, FaBed, FaBus, FaUtensils } from 'react-icons/fa'
+import { FaBed, FaBirthdayCake, FaBook, FaBus, FaCheck, FaLock, FaMapMarkerAlt, FaMoneyBillWave, FaPhone, FaPlus, FaSchool, FaUserGraduate, FaUtensils, FaVenusMars } from 'react-icons/fa'
 
 const Shunchaki = ({ studentId, onExit }) => {
   const [student, setStudent] = useState(null)
@@ -14,7 +14,7 @@ const Shunchaki = ({ studentId, onExit }) => {
         setLoading(false)
         return
       }
-      
+
       try {
         const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/student/getAll`)
         if (res.data.success && res.data.students) {
@@ -35,7 +35,7 @@ const Shunchaki = ({ studentId, onExit }) => {
         setLoading(false)
       }
     }
-    
+
     fetchStudent()
   }, [studentId])
 
@@ -127,6 +127,25 @@ const Shunchaki = ({ studentId, onExit }) => {
 
   const monthlyPayment = calculateMonthlyPayment(student)
 
+  const handleFinal = async () => {
+    try {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/payment/register-history`, {
+        student:student._id,
+        amount_due:monthlyPayment,
+        amount_paid:0,
+        isPaid:false,
+        details:[]
+       })
+       console.log(res.data)
+      if(res.data.success){
+        onExit()
+      }else{
+        alert("Xatolik")
+      }
+    } catch (error) {
+
+    }
+  }
   return (
     <div className="max-w-6xl mx-auto p-4 sm:p-6">
       <div className="text-center mb-10">
@@ -147,7 +166,7 @@ const Shunchaki = ({ studentId, onExit }) => {
               <FaUserGraduate className="text-4xl text-gray-400" />
             </div>
             <h2 className="text-2xl font-bold text-gray-800 mb-2">{student.fullName}</h2>
-            
+
             <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-4 mb-4">
               <h3 className="font-bold text-gray-700 mb-1">Oylik To'lov</h3>
               <p className="text-2xl font-bold text-indigo-700">
@@ -160,54 +179,54 @@ const Shunchaki = ({ studentId, onExit }) => {
         {/* Shaxsiy ma'lumotlar */}
         <div className="lg:col-span-2">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <InfoCard 
-              title="Shaxsiy Maʼlumotlar" 
+            <InfoCard
+              title="Shaxsiy Maʼlumotlar"
               icon={<FaUserGraduate className="text-indigo-600 text-xl" />}
             >
-              <InfoItem 
-                icon={<FaBirthdayCake />} 
-                label="Tug'ilgan kun" 
+              <InfoItem
+                icon={<FaBirthdayCake />}
+                label="Tug'ilgan kun"
                 value={student.date_of_birth ? new Date(student.date_of_birth).toLocaleDateString('uz-UZ') : null}
               />
-              <InfoItem 
-                icon={<FaVenusMars />} 
-                label="Jinsi" 
+              <InfoItem
+                icon={<FaVenusMars />}
+                label="Jinsi"
                 value={student.gender}
               />
-              <InfoItem 
-                icon={<FaSchool />} 
-                label="Oldingi maktab" 
+              <InfoItem
+                icon={<FaSchool />}
+                label="Oldingi maktab"
                 value={student.old_school}
               />
-              <InfoItem 
-                icon={<FaSchool />} 
-                label="Oldingi sinf" 
+              <InfoItem
+                icon={<FaSchool />}
+                label="Oldingi sinf"
                 value={student.old_class}
               />
             </InfoCard>
 
-            <InfoCard 
-              title="Aloqa Maʼlumotlari" 
+            <InfoCard
+              title="Aloqa Maʼlumotlari"
               icon={<FaPhone className="text-blue-600 text-xl" />}
             >
-              <InfoItem 
-                icon={<FaPhone />} 
-                label="Telefon raqam" 
+              <InfoItem
+                icon={<FaPhone />}
+                label="Telefon raqam"
                 value={student.phone}
               />
-              <InfoItem 
-                icon={<FaMapMarkerAlt />} 
-                label="Manzil" 
+              <InfoItem
+                icon={<FaMapMarkerAlt />}
+                label="Manzil"
                 value={student.address}
               />
-              <InfoItem 
-                icon={<FaLock />} 
-                label="Login" 
+              <InfoItem
+                icon={<FaLock />}
+                label="Login"
                 value={student.login}
               />
-              <InfoItem 
-                icon={<FaLock />} 
-                label="Parol" 
+              <InfoItem
+                icon={<FaLock />}
+                label="Parol"
                 value={student.password}
               />
             </InfoCard>
@@ -217,8 +236,8 @@ const Shunchaki = ({ studentId, onExit }) => {
 
       {/* Fanlar bo'limi */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <InfoCard 
-          title="Asosiy Fanlar" 
+        <InfoCard
+          title="Asosiy Fanlar"
           icon={<FaBook className="text-green-600 text-xl" />}
         >
           {student.main_subjects?.length > 0 ? (
@@ -240,8 +259,8 @@ const Shunchaki = ({ studentId, onExit }) => {
           )}
         </InfoCard>
 
-        <InfoCard 
-          title="Qo'shimcha Fanlar" 
+        <InfoCard
+          title="Qo'shimcha Fanlar"
           icon={<FaPlus className="text-purple-600 text-xl" />}
         >
           {student.additionalSubjects?.length > 0 ? (
@@ -265,8 +284,8 @@ const Shunchaki = ({ studentId, onExit }) => {
       </div>
 
       {/* Xizmatlar bo'limi */}
-      <InfoCard 
-        title="Qo'shimcha Xizmatlar" 
+      <InfoCard
+        title="Qo'shimcha Xizmatlar"
         icon={<FaMoneyBillWave className="text-red-600 text-xl" />}
       >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -282,7 +301,7 @@ const Shunchaki = ({ studentId, onExit }) => {
               </p>
             </div>
           </div>
-          
+
           <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-lg flex items-center">
             <div className="bg-green-100 p-3 rounded-full mr-4">
               <FaUtensils className="text-green-600" />
@@ -295,7 +314,7 @@ const Shunchaki = ({ studentId, onExit }) => {
               </p>
             </div>
           </div>
-          
+
           <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-lg flex items-center">
             <div className="bg-purple-100 p-3 rounded-full mr-4">
               <FaBus className="text-purple-600" />
@@ -314,7 +333,7 @@ const Shunchaki = ({ studentId, onExit }) => {
       {/* Yakunlash tugmasi */}
       <div className="flex justify-center mt-10">
         <button
-          onClick={onExit}
+          onClick={handleFinal}
           className="bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold px-8 py-4 rounded-xl hover:opacity-90 transition shadow-lg flex items-center"
         >
           <FaCheck className="mr-2" />

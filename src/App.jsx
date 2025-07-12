@@ -54,7 +54,6 @@ const App = () => {
           <Route path="student-payment" element={<RegisterPayment />} />
           <Route path="monthly-debts" element={<MonthlyPaymentControl />} />
           <Route path="student-refund" element={<RegisterRefund />} />
-          <Route path="student-refund" element={<RegisterRefund />} />
           <Route path="student-list" element={<StudentListRegister />} />
           <Route path="hostel" element={<RegisterHostel />} />
           <Route path="message" element={<RegisterMessage />} />

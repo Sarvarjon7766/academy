@@ -1,47 +1,47 @@
-import axios from 'axios';
-import React, { useEffect, useState } from "react";
-import { FaUserCheck, FaUserTimes, FaPaperPlane, FaChevronLeft, FaChartLine } from "react-icons/fa";
-import { FiCheckCircle } from "react-icons/fi";
-import { useLocation, useNavigate } from "react-router-dom";
+import axios from 'axios'
+import { useEffect, useState } from "react"
+import { FaChartLine, FaChevronLeft, FaPaperPlane, FaUserCheck, FaUserTimes } from "react-icons/fa"
+import { FiCheckCircle } from "react-icons/fi"
+import { useLocation, useNavigate } from "react-router-dom"
 
 const Attendance = () => {
-  const token = localStorage.getItem('token');
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { groupId, students } = location.state || {};
-  const [permission, setPermission] = useState(false);
-  const [showSubmitButton, setShowSubmitButton] = useState(false);
-  const [attendance, setAttendance] = useState({});
-  const today = new Date().setHours(0, 0, 0, 0);
-  const [stats, setStats] = useState({ present: 0, total: 0 });
-  const [isLoading, setIsLoading] = useState(false);
+  const token = localStorage.getItem('token')
+  const location = useLocation()
+  const navigate = useNavigate()
+  const { groupId, students } = location.state || {}
+  const [permission, setPermission] = useState(false)
+  const [showSubmitButton, setShowSubmitButton] = useState(false)
+  const [attendance, setAttendance] = useState({})
+  const today = new Date().setHours(0, 0, 0, 0)
+  const [stats, setStats] = useState({ present: 0, total: 0 })
+  const [isLoading, setIsLoading] = useState(false)
 
   // Authentication and data validation
   useEffect(() => {
     if (!token) {
-      navigate('/login');
-      return;
+      navigate('/login')
+      return
     }
-    
+
     if (!groupId || !students?.length) {
-      navigate('/teacher');
-      return;
+      navigate('/teacher')
+      return
     }
-    
-    setPermission(true);
-  }, [token, navigate, groupId, students]);
+
+    setPermission(true)
+  }, [token, navigate, groupId, students])
 
   // Initialize attendance state
   useEffect(() => {
     if (students?.length) {
       const initialAttendance = students.reduce((acc, student) => {
-        acc[student.id] = { attended: false, grade: '' };
-        return acc;
-      }, {});
-      setAttendance(initialAttendance);
-      setStats({ present: 0, total: students.length });
+        acc[student.id] = { attended: false, grade: '' }
+        return acc
+      }, {})
+      setAttendance(initialAttendance)
+      setStats({ present: 0, total: students.length })
     }
-  }, [students]);
+  }, [students])
 
   const markAttendance = (id) => {
     setAttendance(prev => {
@@ -52,71 +52,71 @@ const Attendance = () => {
           attended: !prev[id]?.attended,
           grade: prev[id]?.attended ? '' : prev[id]?.grade
         }
-      };
-      
+      }
+
       // Update stats
-      const presentCount = Object.values(newAttendance).filter(a => a.attended).length;
-      setStats({ present: presentCount, total: students.length });
-      
-      return newAttendance;
-    });
-    
-    setShowSubmitButton(true);
-  };
+      const presentCount = Object.values(newAttendance).filter(a => a.attended).length
+      setStats({ present: presentCount, total: students.length })
+
+      return newAttendance
+    })
+
+    setShowSubmitButton(true)
+  }
 
   const handleGradeChange = (id, value) => {
     // Validate grade input (0-100)
-    let gradeValue = value;
+    let gradeValue = value
     if (gradeValue !== '') {
-      const numericValue = Number(gradeValue);
-      if (isNaN(numericValue)) return;
-      gradeValue = Math.min(100, Math.max(0, numericValue));
+      const numericValue = Number(gradeValue)
+      if (isNaN(numericValue)) return
+      gradeValue = Math.min(100, Math.max(0, numericValue))
     }
-    
+
     setAttendance(prev => ({
       ...prev,
       [id]: { ...prev[id], grade: gradeValue }
-    }));
-  };
+    }))
+  }
 
   const submitAttendance = async () => {
-    setIsLoading(true);
+    setIsLoading(true)
     try {
       // Transform to required format: { studentId: { attended: true, grade: number } }
       const attendanceData = Object.entries(attendance).reduce(
         (acc, [studentId, { attended, grade }]) => {
           if (attended) {
-            acc[studentId] = { attended, grade };
+            acc[studentId] = { attended, grade }
           }
-          return acc;
+          return acc
         }, {}
-      );
+      )
 
       const { data } = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/attandance/create`,
-        { 
-          attendance: attendanceData, 
-          gId:{groupId} 
+        {
+          attendance: attendanceData,
+          gId: { groupId }
         },
         {
-          headers: { 
-            Authorization: `Bearer ${token}` 
+          headers: {
+            Authorization: `Bearer ${token}`
           }
         }
-      );
+      )
 
-      alert(data.message || "Davomat muvaffaqiyatli qayd etildi!");
-      navigate('/teacher');
+      alert(data.message || "Davomat muvaffaqiyatli qayd etildi!")
+      navigate('/teacher')
     } catch (error) {
-      alert(error.response?.data?.message || "Xatolik yuz berdi!");
+      alert(error.response?.data?.message || "Xatolik yuz berdi!")
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   // Calculate attendance percentage
-  const attendancePercentage = stats.total > 0 ? Math.round((stats.present / stats.total) * 100) : 0;
-  
+  const attendancePercentage = stats.total > 0 ? Math.round((stats.present / stats.total) * 100) : 0
+
   // Early return for permission errors
   if (!permission) {
     return (
@@ -127,72 +127,72 @@ const Attendance = () => {
           <p className="text-gray-600">Talabalar ro'yxati yuklanmoqda</p>
         </div>
       </div>
-    );
+    )
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 py-8 px-4">
-      <div className="mx-auto">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
-          <button 
+          <button
             onClick={() => navigate('/teacher')}
-            className="flex items-center gap-2 bg-white py-3 px-5 rounded-xl shadow hover:shadow-md transition-all duration-300 text-indigo-700 hover:text-indigo-900 font-medium"
+            className="flex items-center gap-2 bg-white py-3 px-4 sm:px-5 rounded-xl shadow hover:shadow-md transition-all duration-300 text-indigo-700 hover:text-indigo-900 font-medium w-full md:w-auto justify-center"
           >
             <FaChevronLeft />
             <span>Orqaga qaytish</span>
           </button>
-          
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-800">Davomatni belgilash</h1>
-            <p className="text-gray-600 mt-2">
-              {new Date(today).toLocaleDateString('uz-UZ', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
+
+          <div className="text-center order-first md:order-none w-full">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Davomatni belgilash</h1>
+            <p className="text-gray-600 mt-2 text-sm sm:text-base">
+              {new Date(today).toLocaleDateString('uz-UZ', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
               })}
             </p>
           </div>
-          
-          <div className="flex items-center gap-2 bg-white py-2 px-4 rounded-xl shadow">
+
+          <div className="flex items-center gap-2 bg-white py-2 px-4 rounded-xl shadow w-full md:w-auto justify-center">
             <FaChartLine className="text-indigo-600" />
             <span className="font-medium">
               <span className="text-green-600">{stats.present}</span> / {stats.total}
             </span>
           </div>
         </div>
-        
+
         {/* Stats Card */}
         <div className="bg-white rounded-2xl shadow-xl p-6 mb-8">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-4">
-              <div className="bg-indigo-100 p-4 rounded-xl">
-                <FaUserCheck className="text-indigo-600 text-2xl" />
+              <div className="bg-indigo-100 p-3 sm:p-4 rounded-xl">
+                <FaUserCheck className="text-indigo-600 text-xl sm:text-2xl" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-700">Davomat statistikasi</h3>
-                <p className="text-gray-500">{stats.present} ta talaba ishtirok etmoqda</p>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-700">Davomat statistikasi</h3>
+                <p className="text-gray-500 text-sm sm:text-base">{stats.present} ta talaba ishtirok etmoqda</p>
               </div>
             </div>
-            
+
             <div className="w-full sm:w-64">
               <div className="flex items-center justify-between mb-1">
                 <span className="text-sm font-medium text-gray-700">Davomat foizi</span>
                 <span className="text-sm font-bold text-gray-700">{attendancePercentage}%</span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-3">
-                <div 
-                  className="bg-gradient-to-r from-green-500 to-teal-500 h-3 rounded-full transition-all duration-700"
+              <div className="w-full bg-gray-200 rounded-full h-2 sm:h-3">
+                <div
+                  className="bg-gradient-to-r from-green-500 to-teal-500 h-2 sm:h-3 rounded-full transition-all duration-700"
                   style={{ width: `${attendancePercentage}%` }}
                 ></div>
               </div>
             </div>
           </div>
         </div>
-        
-        {/* Enhanced Table */}
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-12">
+
+        {/* Desktop Table */}
+        <div className="hidden md:block bg-white rounded-2xl shadow-xl overflow-hidden mb-12">
           <div className="overflow-x-auto">
             <table className="w-full min-w-full">
               <thead>
@@ -206,8 +206,8 @@ const Attendance = () => {
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {students.map((student, index) => (
-                  <tr 
-                    key={student.id} 
+                  <tr
+                    key={student.id}
                     className="hover:bg-indigo-50 transition-colors"
                   >
                     <td className="py-4 px-6 font-medium">
@@ -228,13 +228,12 @@ const Attendance = () => {
                     <td className="py-4 px-6 text-center">
                       <button
                         onClick={() => markAttendance(student.id)}
-                        className={`p-3 rounded-xl transition duration-200 ${
-                          attendance[student.id]?.attended
+                        className={`p-3 rounded-xl transition duration-200 ${attendance[student.id]?.attended
                             ? 'bg-green-100 text-green-600'
                             : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-                        }`}
-                        aria-label={attendance[student.id]?.attended 
-                          ? "Davomat belgilangan" 
+                          }`}
+                        aria-label={attendance[student.id]?.attended
+                          ? "Davomat belgilangan"
                           : "Davomat belgilash"
                         }
                       >
@@ -253,15 +252,14 @@ const Attendance = () => {
                           max="100"
                           disabled={!attendance[student.id]?.attended}
                           value={attendance[student.id]?.grade}
-                          onChange={(e) => 
+                          onChange={(e) =>
                             handleGradeChange(student.id, e.target.value)
                           }
                           placeholder="0-100"
-                          className={`w-full p-3 rounded-lg border shadow-sm transition duration-200 text-gray-800 font-medium ${
-                            attendance[student.id]?.attended
+                          className={`w-full p-3 rounded-lg border shadow-sm transition duration-200 text-gray-800 font-medium ${attendance[student.id]?.attended
                               ? 'bg-white border-indigo-300 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500'
                               : 'bg-gray-100 border-gray-300 text-gray-400 cursor-not-allowed'
-                          }`}
+                            }`}
                         />
                         {attendance[student.id]?.attended && (
                           <div className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 font-medium">
@@ -271,11 +269,10 @@ const Attendance = () => {
                       </div>
                     </td>
                     <td className="py-4 px-6 text-center">
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                        attendance[student.id]?.attended
+                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${attendance[student.id]?.attended
                           ? 'bg-green-100 text-green-800'
                           : 'bg-gray-100 text-gray-800'
-                      }`}>
+                        }`}>
                         {attendance[student.id]?.attended ? (
                           <>
                             <FaUserCheck className="mr-1" /> Ishtirok etdi
@@ -293,14 +290,96 @@ const Attendance = () => {
             </table>
           </div>
         </div>
-        
+
+        {/* Mobile Cards */}
+        <div className="md:hidden grid grid-cols-1 gap-4 mb-12">
+          {students.map((student, index) => (
+            <div 
+              key={student.id} 
+              className="bg-white rounded-2xl shadow-xl p-4 transition-all hover:shadow-md"
+            >
+              <div className="flex justify-between items-start">
+                <div className="flex items-center gap-3">
+                  <div className="bg-indigo-100 w-10 h-10 rounded-full flex items-center justify-center">
+                    <span className="font-bold text-indigo-700">
+                      {student.studentName.charAt(0)}
+                    </span>
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-gray-800">{student.studentName}</h3>
+                    <p className="text-sm text-gray-600">Talaba #{index + 1}</p>
+                  </div>
+                </div>
+                
+                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${attendance[student.id]?.attended
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-gray-100 text-gray-800'
+                  }`}>
+                  {attendance[student.id]?.attended ? (
+                    <>
+                      <FaUserCheck className="mr-1" /> Ishtirok etdi
+                    </>
+                  ) : (
+                    <>
+                      <FaUserTimes className="mr-1" /> Keldi-ketdi
+                    </>
+                  )}
+                </span>
+              </div>
+              
+              <div className="mt-4 flex items-center justify-between">
+                <button
+                  onClick={() => markAttendance(student.id)}
+                  className={`p-3 rounded-xl transition duration-200 ${attendance[student.id]?.attended
+                      ? 'bg-green-100 text-green-600'
+                      : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                    }`}
+                  aria-label={attendance[student.id]?.attended
+                    ? "Davomat belgilangan"
+                    : "Davomat belgilash"
+                  }
+                >
+                  {attendance[student.id]?.attended ? (
+                    <FaUserCheck size={20} />
+                  ) : (
+                    <FiCheckCircle size={20} />
+                  )}
+                </button>
+                
+                <div className="relative w-32">
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    disabled={!attendance[student.id]?.attended}
+                    value={attendance[student.id]?.grade}
+                    onChange={(e) =>
+                      handleGradeChange(student.id, e.target.value)
+                    }
+                    placeholder="0-100"
+                    className={`w-full p-3 rounded-lg border shadow-sm transition duration-200 text-gray-800 font-medium ${attendance[student.id]?.attended
+                        ? 'bg-white border-indigo-300 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500'
+                        : 'bg-gray-100 border-gray-300 text-gray-400 cursor-not-allowed'
+                      }`}
+                  />
+                  {attendance[student.id]?.attended && (
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 font-medium">
+                      %
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
         {/* Floating Submit Button */}
         {showSubmitButton && (
-          <div className="fixed bottom-6 left-0 right-0 flex justify-center z-10 animate-fade-in">
+          <div className="fixed bottom-6 left-0 right-0 flex justify-center z-10 animate-fade-in px-4">
             <button
               onClick={submitAttendance}
               disabled={isLoading}
-              className="flex items-center gap-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-4 px-8 rounded-full shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
+              className="flex items-center gap-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-4 px-8 rounded-full shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 w-full max-w-md"
             >
               {isLoading ? (
                 <>
@@ -321,7 +400,7 @@ const Attendance = () => {
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Attendance;
+export default Attendance

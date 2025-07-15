@@ -29,12 +29,7 @@ const RegisterHome = () => {
       link: '/register/student-payment',
       color: "bg-gradient-to-r from-emerald-500 to-teal-500"
     },
-    {
-      icon: <FaMoneyCheckAlt />,
-      title: "To'lovni qaytarish",
-      link: '/register/student-refund',
-      color: "bg-gradient-to-r from-amber-500 to-orange-500"
-    },
+
     {
       icon: <FaUsers />,
       title: "Talabalar ro'yxati",

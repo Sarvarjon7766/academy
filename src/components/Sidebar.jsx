@@ -110,7 +110,6 @@ const Sidebar = ({ isOpen, toggleSidebar, role }) => {
     register: [
       { name: 'Asosiy', link: '/register' },
       { name: 'Talaba registratsiya', link: '/register/student-register' },
-      { name: "To'lov qaytarish", link: '/register/student-refund' },
       { name: "Yakshanba", link: '/register/attandance-sunday' },
       { name: 'Talaba holati', link: '/register/student-active' },
       { name: "Yotoqxona", link: '/register/hostel' },

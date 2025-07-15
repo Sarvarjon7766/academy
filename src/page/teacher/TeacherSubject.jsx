@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { FaChartBar, FaUserEdit, FaUsers, FaChevronRight, FaBell } from 'react-icons/fa';
 import { useNavigate } from "react-router-dom";
 import { AddGroup, Statistics, WithdrawGroup, StudentList } from '../../components/teacher/index';
+import axios from 'axios'
 
 const TeacherSubject = () => {
   const token = localStorage.getItem('token');
@@ -26,6 +27,17 @@ const TeacherSubject = () => {
     setIsActive(id);
     setActiveTab(id);
   };
+
+  useEffect(()=>{
+    const fetchStatistics = async ()=>{
+      try {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/statistics/inMonth`)
+      } catch (error) {
+        
+      }
+    }
+    fetchStatistics()
+  },[])
 
   // Mock data for statistics
   const statsData = [

@@ -138,8 +138,7 @@ const RegisterPayment = () => {
           <FaArrowLeft className="mr-2" /> Orqaga
         </button>
         <h2 className="text-3xl font-bold text-gray-800 flex items-center">
-          <FaMoneyBillWave className="mr-3 text-blue-600" />
-          Talabalar To'lov Boshqaruvi
+          To'lovlar Boshqaruvi
         </h2>
       </div>
 

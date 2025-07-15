@@ -128,11 +128,8 @@ const StudentStatusManager = () => {
         <div className="text-center mb-10">
           <h1 className="text-3xl md:text-4xl font-bold text-indigo-800 flex items-center justify-center">
             <FaUserGraduate className="mr-3" />
-            Talaba To'lovlari Boshqaruvi
+            Talabani chetlashtirish
           </h1>
-          <p className="text-gray-600 mt-2 max-w-2xl mx-auto">
-            Talabalarning to'lov ma'lumotlarini kuzatish, to'lov qabul qilish va safdan chiqarish
-          </p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8">

@@ -125,7 +125,6 @@ const OtherCosts = ({ studentId, onclick, onHotelChange }) => {
           <FaMoneyBillWave className="mr-3" />
           Qo'shimcha Xizmatlar
         </h1>
-        <p className="opacity-90">Talaba uchun xizmatlarni tanlang</p>
       </div>
 
       {/* Filtr tugmalari */}
@@ -211,7 +210,7 @@ const OtherCosts = ({ studentId, onclick, onHotelChange }) => {
             onClick={royxatdanOtish}
             className="px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 flex items-center justify-center shadow-md"
           >
-            <FaCheck className="mr-2" /> Xizmatlarga yozilish
+            <FaCheck className="mr-2" /> Xizmatlarni biriktirish
           </button>
 
           <button

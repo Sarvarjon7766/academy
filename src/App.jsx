@@ -7,6 +7,8 @@ import StudentList from './page/admin/StudentList.jsx'
 import TeacherAttandance from './page/admin/teacher/TeacherAttandance.jsx'
 import { EmployerList, EmployerRegister } from './page/admin/employer/index.js'
 import TeacherRegister from './page/admin/teacher/TeacherRegister.jsx'
+import Registrator from './page/admin/Registrator.jsx'
+import RegisterList from './page/admin/RegisterList.jsx'
 import { AttandanseSunday, RegisterDashboard, RegisterHome, RegisterHostel, RegisterMessage, RegisterPayment, RegisterProfile, RegisterRefund, StudentsRegister, StudentStatusManager, UpdateStudent,StudentListRegister,MonthlyPaymentControl,StudentActive } from './page/register/index.js'
 import { Attendance, Grades, Schedule, TeacherDashboard, TeacherHome, TeacherMessage, TeacherProfile, TeacherSubject } from './page/teacher/index.js'
 
@@ -28,6 +30,7 @@ const App = () => {
           <Route path="teacher-register" element={<TeacherRegister />} />
           <Route path="employer-register" element={<EmployerRegister />} />
           <Route path="employer" element={<EmployerList />} />
+          <Route path="register" element={<RegisterList />} />
           <Route path="subject" element={<Subject />} />
           <Route path="finence" element={<Finence />} />
           <Route path="messages" element={<Message />} />
@@ -37,6 +40,7 @@ const App = () => {
           <Route path="teacher-attandance" element={<TeacherAttandance />} />
           <Route path="profile" element={<TeacherProfile />} />
           <Route path="message" element={<TeacherMessage />} />
+          <Route path="registrator-register" element={<Registrator />} />
         </Route>
         <Route path="/teacher" element={<TeacherDashboard />}>
           <Route index element={<TeacherHome />} />

@@ -54,7 +54,7 @@ const AddRooms = ({ onchange }) => {
                 </h3>
                 <button 
                   onClick={() => setIsModalOpen(false)}
-                  className="text-white hover:text-gray-200"
+                  className="text-white bg-indigo-500 hover:text-gray-200"
                 >
                   <FiPlus className="transform rotate-45 text-xl" />
                 </button>
@@ -77,7 +77,7 @@ const AddRooms = ({ onchange }) => {
                   value={roomNumber}
                   onChange={(e) => setRoomNumber(e.target.value)}
                   className="w-full p-3 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Masalan: 101"
+                  placeholder="Masalan: 1-xona"
                   required
                 />
               </div>

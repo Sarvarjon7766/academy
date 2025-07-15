@@ -1,35 +1,33 @@
-import React from 'react';
 import {
-  FaFacebook, FaTelegram, FaInstagram, FaPhone,
-  FaYoutube, FaEnvelope
-} from 'react-icons/fa';
-import { MdLocationOn, MdAccessTime } from 'react-icons/md';
+  FaFacebook,
+  FaInstagram, FaPhone,
+  FaTelegram,
+  FaYoutube
+} from 'react-icons/fa'
+import { MdAccessTime, MdLocationOn } from 'react-icons/md'
 
 const Contact = () => {
   return (
     <div className="w-full bg-gradient-to-b from-white to-blue-50 py-10 px-4">
       {/* Social Media Section - Full Width */}
       <div className="max-w-6xl mx-auto p-6 md:p-10 rounded-3xl  mb-10">
-        <h2 className="text-3xl md:text-4xl font-bold text-center text-blue-700 mb-10">
+        <h2 className="text-2xl md:text-3xl font-bold text-center text-blue-700 mb-10">
           Ijtimoiy tarmoqlarimizga obuna bo'ling
         </h2>
         <div className="flex flex-wrap gap-6 justify-center">
-          <a href="#" className="text-blue-700 hover:scale-110 transition-all">
+          <a href="https://www.facebook.com/profile.php?id=61576358593846" className="text-blue-700 hover:scale-110 transition-all">
             <FaFacebook size={40} />
           </a>
-          <a href="#" className="text-blue-400 hover:scale-110 transition-all">
+          <a href="https://t.me/BulungurAkademiyasi" className="text-blue-400 hover:scale-110 transition-all">
             <FaTelegram size={40} />
           </a>
-          <a href="#" className="text-pink-600 hover:scale-110 transition-all">
+          <a href="https://www.instagram.com/bulungur_akademiyasi?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" className="text-pink-600 hover:scale-110 transition-all">
             <FaInstagram size={40} />
           </a>
-          <a href="#" className="text-red-500 hover:scale-110 transition-all">
-            <FaEnvelope size={40} />
-          </a>
-          <a href="#" className="text-green-500 hover:scale-110 transition-all">
+          <a href="tel:+998945383714" className="text-green-500 hover:scale-110 transition-all">
             <FaPhone size={40} />
           </a>
-          <a href="#" className="text-red-600 hover:scale-110 transition-all">
+          <a href="http://www.youtube.com/@Bulung%CA%BBurakademiyasi" className="text-red-600 hover:scale-110 transition-all">
             <FaYoutube size={40} />
           </a>
         </div>
@@ -45,14 +43,14 @@ const Contact = () => {
               <FaPhone className="text-blue-600 text-3xl mt-1" />
               <div>
                 <h3 className="text-lg font-semibold text-gray-800">Telefon raqam</h3>
-                <p className="text-gray-600">+99 897 438 08 96</p>
+                <p className="text-gray-600">+99 894 538 37 14</p>
               </div>
             </div>
             <div className="flex items-start gap-5">
-              <FaEnvelope className="text-red-500 text-3xl mt-1" />
+              <FaTelegram className="text-blue-500 text-3xl mt-1" />
               <div>
-                <h3 className="text-lg font-semibold text-gray-800">Elektron pochta</h3>
-                <p className="text-gray-600">bulungur@gmail.com</p>
+                <h3 className="text-lg font-semibold text-gray-800">Telegram</h3>
+                <p className="text-gray-600">@BulungurAkademiyasi</p>
               </div>
             </div>
             <div className="flex items-start gap-5">
@@ -71,8 +69,10 @@ const Contact = () => {
           <div className="flex items-start gap-4 mb-6">
             <MdLocationOn className="text-green-600 text-3xl mt-1" />
             <p className="text-gray-600 text-lg">
-              Bulung'ur tumani,<br />
-              Mingchinor MFY, 64-uy
+              Samarqand viloyati, Bulung'ur tumani,<br />
+              Soxibkor QFY Gulzor mahallasi,<br />
+              Birdamlik ko'chasi, 13-uy,<br />
+              Mo'ljal: 52-maktab
             </p>
           </div>
           <div className="relative overflow-hidden rounded-2xl shadow-md" style={{ paddingTop: '56.25%' }}>
@@ -87,8 +87,8 @@ const Contact = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
 export default Contact;
 

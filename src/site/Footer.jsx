@@ -7,7 +7,7 @@ const Footer = () => {
         {/* Footer Content */}
         <div className="flex flex-col items-center space-y-4">
           {/* Footer Header */}
-          <h1 className="text-center text-sm sm:text-base md:text-lg lg:text-xl font-semibold">
+          <h1 className="text-center text-sm sm:text-base  lg:text-lg  font-semibold">
             &copy; Bulung'ur Akademiyasi 2025
           </h1>
           

@@ -20,6 +20,7 @@ import {
   TeacherFinence,
   YearlyFinence
 } from './Finence/index'
+import { MonthlyPaymentControl } from '../register'
 
 const Finence = () => {
   const [isAvailable, setIsAvailable] = useState('finence')
@@ -132,7 +133,7 @@ const Finence = () => {
       {isAvailable === 'profitfinence' && <BenefitsFinence />}
       {isAvailable === 'cashjournal' && <CashJournal />}
       {isAvailable === 'expensereport' && <ExpenseReport />}
-      {isAvailable === 'debtorsreport' && <DebtorsReport />}
+      {isAvailable === 'debtorsreport' && <MonthlyPaymentControl />}
     </div>
   )
 }

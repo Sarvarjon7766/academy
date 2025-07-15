@@ -310,12 +310,6 @@ const GeneralReport = () => {
             </table>
           </div>
         </div>
-
-        {/* Footer */}
-        <div className="mt-10 text-center text-gray-500 text-sm">
-          <p>Oxirgi yangilanish: Bugun, 15:24</p>
-          <p className="mt-2">© 2024 Moliyaviy Monitoring Tizimi. Barcha huquqlar himoyalangan.</p>
-        </div>
       </div>
     </div>
   );

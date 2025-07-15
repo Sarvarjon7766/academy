@@ -33,15 +33,15 @@ const Statistics = () => {
         <div className="p-4">
           <StudentAttendanceChart />
         </div>
-        <div className="p-4">
+        {/* <div className="p-4">
           <GradePieChart />
-        </div>
-        <div className="p-4">
+        </div> */}
+        {/* <div className="p-4">
           <StudentGradeChart />
-        </div>
-        <div className="p-4">
+        </div> */}
+        {/* <div className="p-4">
           <SubjectGroupChart />
-        </div>
+        </div> */}
       </div>
     </div>
   )

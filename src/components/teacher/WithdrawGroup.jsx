@@ -16,6 +16,7 @@ const WithdrawGroup = () => {
 	const [isgrActive, setIsgrActive] = useState(null)
 	const [isModalOpen, setIsModalOpen] = useState(false)
 	const [selectedStudent, setSelectedStudent] = useState(null)
+	const [permission, setPermission] = useState(false)
 
 	const fetchData = async () => {
 		try {
@@ -81,6 +82,18 @@ const WithdrawGroup = () => {
 
 	const handleConfirmDelete = () => {
 		handleCloseModal()
+	}
+
+	if (!permission) {
+		return (
+			<div className="w-full mx-auto pt-8 px-4 sm:px-6 lg:px-8 bg-gray-50">
+				<div className="bg-white p-6 rounded-lg shadow-lg text-center">
+					<h2 className="text-xl sm:text-2xl font-bold text-red-600 mb-4">
+						Xizmatdan foydalanish vaqtincha ishchi holatda emas
+					</h2>
+				</div>
+			</div>
+		)
 	}
 
 	return (
@@ -163,7 +176,7 @@ const WithdrawGroup = () => {
 					</>
 				) : (
 					<h2 className="text-red-500 text-center mt-5 font-semibold text-sm sm:text-base">
-						Hech qanday ma'lumot yo‘q
+						Hech qanday ma'lumot yo'q
 					</h2>
 				)}
 			</div>

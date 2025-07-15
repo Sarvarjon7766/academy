@@ -22,9 +22,20 @@ const Navbar = ({ toggleSidebar }) => {
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/profile/getOne`, { headers })
 
       if (res.status === 200) {
-        setUser(res.data.user)
-        res.data.user.role == 1 ? setNavigate('teacher') : setNavigate('register')
-      } else if (res.status === 401 || res.status === 403 || res.status === 404) {
+        const userData = res.data.user
+        setUser(userData)
+
+        if (userData.role == 1) {
+          if (userData.isAdmin) {
+            setNavigate('admin')
+          } else {
+            setNavigate('teacher')
+          }
+        } else {
+          setNavigate('register')
+        }
+
+      } else if ([401, 403, 404].includes(res.status)) {
         navigate('/login')
       }
 
@@ -33,6 +44,7 @@ const Navbar = ({ toggleSidebar }) => {
       navigate('/login')
     }
   }, [token, navigate])
+
 
   useEffect(() => {
     fetchData()

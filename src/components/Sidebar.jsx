@@ -73,7 +73,7 @@ const Sidebar = ({ isOpen, toggleSidebar, role }) => {
       { name: "Qo'shimcha xizmatalar", link: '/admin/subject' },
 
       { name: 'Moliya', link: '/admin/finence' },
-      { name: 'Xabarlar', link: '/admin/message' },
+      { name: 'Xabarlar', link: '/admin/messages' },
       { name: "E'lonlar", link: '/admin/ads' },
       { name: "Murojaatlar", link: '/admin/application' },
 
@@ -83,7 +83,6 @@ const Sidebar = ({ isOpen, toggleSidebar, role }) => {
       { name: 'Asosiy', link: '/teacher' },
       { name: 'Profil', link: '/teacher/profile' },
       { name: 'Talabalar boshqaruvi', link: '/teacher/subject' },
-      { name: 'Baholash', link: '/teacher/grade' },
       { name: 'Chiqish', link: '/login' }
     ],
     student: [

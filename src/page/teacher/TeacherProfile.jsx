@@ -1,7 +1,7 @@
 import axios from "axios"
 import React, { useCallback, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-// import photo from '../../../../backend/static/0b47bf00-52d1-41a9-ab70-d08b03fbd6f0.jpg'
+
 
 const TeacherProfile = () => {
   const token = localStorage.getItem("token")
@@ -72,11 +72,25 @@ const TeacherProfile = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center">
-          <img
-            
-            alt="Teacher"
-            className="w-36 h-36 object-cover rounded-full border-4 border-indigo-300 shadow-md"
-          />
+                    {user.image ? (
+            <img
+              src={user.image}
+              alt="Teacher"
+              className="w-36 h-36 object-cover rounded-full border-4 border-indigo-300 shadow-md"
+            />
+          ) : (
+            <div className="w-36 h-36 rounded-full border-4 border-indigo-300 bg-indigo-100 flex items-center justify-center shadow-md">
+              <span className="text-4xl font-bold text-indigo-800">
+                {user.fullName
+                  ? user.fullName
+                      .split(' ')
+                      .map(n => n[0])
+                      .join('')
+                      .slice(0, 2)
+                  : 'T'}
+              </span>
+            </div>
+          )}
           <h2 className="text-xl font-semibold text-blue-700 mt-4">{user.fullName || "Noma'lum"}</h2>
           <div className="mt-6 w-full space-y-2">
             <p className="text-gray-700"><span className="font-semibold text-indigo-600">📞 Telefon:</span> {user.phone || "Noma'lum"}</p>
